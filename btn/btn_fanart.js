@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.1
+// @version      1.1.2
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -29,7 +29,7 @@
         'id': 'BTN_Fanart_Config',
         'title': `
             <div>
-                <div style="user-select: none; font-family: 'Bebas Neue', Helvetica, Tahoma, Geneva, sans-serif; background-color: #38a0d2; -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-filter: brightness(110%); filter: drop-shadow(1px 1px 5px rgba(56, 160, 210, 0.31)) brightness(130%); transition: all 0.3s; font-weight: bold; padding-top: 3%;">
+                <div style="user-select: none; font-family: 'Bebas Neue', Helvetica, Tahoma, Geneva, sans-serif; background-color: #38a0d2; -webkit-background-clip: text; -webkit-text-fill-color: transparent; -webkit-filter: brightness(110%) filter: drop-shadow(1px 1px 5px rgba(56, 160, 210, 0.31)) brightness(130%); transition: all 0.3s; font-weight: bold; padding-top: 3%;">
                     BTN Fanart Settings<br>
                 </div>
                 <div style="margin-top:15px"><small style="font-weight: 300; color: #95a5a6; display: block; font-size: 0.6rem; margin-top: 5px;"><i>Hover over settings marked with * to see more information</i></small></div>
@@ -734,6 +734,8 @@
                 backdrop-filter: blur(${CONFIG.blurAmount}px) !important;
                 -webkit-backdrop-filter: blur(${CONFIG.blurAmount}px) !important;
                 margin: 0 auto;
+                transition: background-image 0.3s ease-in-out; /* Add transition for smoother appearance */
+                will-change: background-image; /* Hint browser to optimize this property */
             }
 
             #content:has(.main_column > table#discog_table) .thin > center, #series .thin > center {
@@ -874,6 +876,13 @@
 
     // Preload an image and return a promise
     function preloadImage(url) {
+        // Add a preload link to hint the browser to prioritize this resource
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'image';
+        preloadLink.href = url;
+        document.head.appendChild(preloadLink);
+        
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(url);
@@ -888,6 +897,14 @@
             // Try to get the current URL to use as a cache key base
             const pageUrl = window.location.href;
             const cacheKeyBase = pageUrl.split('?')[0] + (pageUrl.match(/id=(\d+)/) ? pageUrl.match(/id=(\d+)/)[1] : '');
+
+            // First check if we have a cached background URL - if so, apply it immediately 
+            // while we fetch the rest of the data to provide instant visual feedback
+            const cachedBackgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
+            if (cachedBackgroundUrl) {
+                log('Found cached background URL, applying immediately');
+                applyBackground(cachedBackgroundUrl);
+            }
 
             // First, check if we have cached TVDB ID
             let tvdbId = getCachedData(`${cacheKeyBase}_tvdbId`);
@@ -922,10 +939,18 @@
             if (backgroundUrls && backgroundUrls.length > 0) {
                 // Pick a random background from the available ones
                 backgroundUrl = backgroundUrls[Math.floor(Math.random() * backgroundUrls.length)];
+                
+                // Store last used background URL in cache
+                if (backgroundUrl) {
+                    setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
+                }
+            } else if (!cachedBackgroundUrl) {
+                // Fallback to cached background only if we don't have one already applied
+                backgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
             }
 
-            // If no background found from fanart.tv, look for background images on the page
-            if (!backgroundUrl ) {
+            // If no background found from fanart.tv or cache, look for background images on the page
+            if (!backgroundUrl && !cachedBackgroundUrl) {
                 console.log('BTN Fanart: No fanart.tv background found, checking page for images');
 
                 // Look for Series Fan Art image
@@ -934,6 +959,11 @@
                     // Get the first fanart image href
                     backgroundUrl = fanartImages[0].src;
                     console.log('BTN Fanart: Found page background image:', backgroundUrl);
+                    
+                    // Cache this found image URL
+                    if (backgroundUrl) {
+                        setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
+                    }
                 }
 
                 // If still no background found, try looking for banner images
@@ -942,6 +972,9 @@
                     if (bannerImg && bannerImg.src) {
                         backgroundUrl = bannerImg.src;
                         console.log('BTN Fanart: Using banner image as background:', backgroundUrl);
+                        
+                        // Cache this found banner URL
+                        setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
                     }
                 }
             }
@@ -952,8 +985,9 @@
             // Track if logo was successfully applied
             let logoApplied = false;
 
-            // Preload background image if available
-            if (backgroundUrl) {
+            // Apply background if we have a new URL and haven't already applied a cached one,
+            // or if the new URL is different from the cached one we already applied
+            if (backgroundUrl && (!cachedBackgroundUrl || backgroundUrl !== cachedBackgroundUrl)) {
                 preloadPromises.push(
                     preloadImage(backgroundUrl)
                     .then(() => {
@@ -972,6 +1006,9 @@
                     preloadImage(logoUrl)
                     .then(() => {
                         logoApplied = replaceSiteLogo(logoUrl);
+                        
+                        // Cache the successful logo URL for faster loading on revisits
+                        setCachedData(`${cacheKeyBase}_logoUrl`, logoUrl);
                         console.log('BTN Fanart: Logo replaced successfully');
                     })
                     .catch(error => {
@@ -980,19 +1017,31 @@
                 );
             }
 
-            // Wait for all preloads to complete
-            await Promise.allSettled(preloadPromises);
-
-            // Show content once everything is done
-            showContent(logoApplied);
+            // If we're showing content after images load, wait for preloads to complete
+            if (CONFIG.hideUntilLoaded && preloadPromises.length > 0) {
+                await Promise.allSettled(preloadPromises);
+                // Show content once everything is done
+                showContent(logoApplied);
+            } else {
+                // Otherwise show content immediately and let images load in background
+                // Wait a small amount of time to ensure basic styling is applied
+                setTimeout(() => {
+                    showContent(logoApplied);
+                }, 100);
+                
+                // Still track completion in background
+                Promise.allSettled(preloadPromises).then(() => {
+                    log('All image preloads complete or failed');
+                });
+            }
 
         } catch (error) {
             console.error('BTN Fanart: Error in init', error);
             showContent(); // Show content even if there's an error
         }
     }
-
-    // Start script execution immediately
+    
+    // Start immediately
     function waitForTvdbOrBanner() {
         // Try to find TVDB link or banner immediately
         const tvdbLink = document.querySelector('a[href*="thetvdb.com"]');

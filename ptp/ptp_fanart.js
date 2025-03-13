@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.3
+// @version      1.1.4
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -449,86 +449,6 @@
         }
     `;
 
-    // Apply initial styles to hide content IMMEDIATELY - this runs at document-start
-    if (CONFIG.hideUntilLoaded) {
-        const initialCSS = `
-            /* Hide everything immediately */
-            html body * {
-                display: none !important;
-            }
-
-            /* Only show our overlay */
-            html::before {
-                content: "";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(9, 12, 24, 1);
-                z-index: 2147483647;
-                display: block !important;
-            }
-
-            /* Loading text */
-            html::after {
-                content: "Loading artwork...";
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -70px);
-                font-size: 24px;
-                color: #fff;
-                font-family: Arial, sans-serif;
-                z-index: 2147483647;
-                text-align: center;
-                display: block !important;
-            }
-
-            /* Spinner style */
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
-
-            #ptp-fanart-spinner-early {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                width: 50px;
-                height: 50px;
-                margin-top: 15px;
-                margin-left: -25px;
-                border: 4px solid rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                border-top-color: #fff;
-                z-index: 2147483647;
-                animation: spin 1s ease-in-out infinite;
-                display: block !important;
-            }
-        `;
-        const styleElement = document.createElement('style');
-        styleElement.id = 'ptp-fanart-initial-block';
-        styleElement.textContent = initialCSS;
-
-        // Insert style element as early as possible
-        (document.head || document.documentElement).appendChild(styleElement);
-
-        // Create early spinner element - but we need to handle the case where body isn't available yet
-        const spinner = document.createElement('div');
-        spinner.id = 'ptp-fanart-spinner-early';
-
-        // Try to add the spinner immediately if body exists
-        if (document.body) {
-            document.body.appendChild(spinner);
-        } else {
-            // If body doesn't exist yet, add an event listener for when it's created
-            document.addEventListener('DOMContentLoaded', () => {
-                document.body.appendChild(spinner);
-            });
-        }
-    }
-
     // Apply initial styles to hide content immediately
     function applyInitialStyles() {
         if (CONFIG.hideUntilLoaded) {
@@ -594,20 +514,37 @@
                     animation: spin 1s ease-in-out infinite;
                 }
             `;
-            document.head.appendChild(styleElement);
 
-            // Add spinner element to the body
-            const spinner = document.createElement('div');
-            spinner.id = 'ptp-fanart-spinner';
+            // Handle the case where document.head doesn't exist yet
+            const addStyle = () => {
+                if (document.head) {
+                    document.head.appendChild(styleElement);
+                } else {
+                    // If head doesn't exist yet, wait for it
+                    document.addEventListener('DOMContentLoaded', () => {
+                        document.head.appendChild(styleElement);
+                    }, { once: true });
+                }
+            };
+            
+            addStyle();
 
-            // Add the spinner as soon as the body is available
-            if (document.body) {
-                document.body.appendChild(spinner);
-            } else {
-                document.addEventListener('DOMContentLoaded', () => {
+            // Add spinner element to the body when it's available
+            const addSpinner = () => {
+                const spinner = document.createElement('div');
+                spinner.id = 'ptp-fanart-spinner';
+                
+                if (document.body) {
                     document.body.appendChild(spinner);
-                });
-            }
+                } else {
+                    // If body isn't available yet, wait for it
+                    document.addEventListener('DOMContentLoaded', () => {
+                        document.body.appendChild(spinner);
+                    }, { once: true });
+                }
+            };
+            
+            addSpinner();
         }
     }
 
@@ -801,6 +738,8 @@
                 background-repeat: no-repeat !important;
                 filter: blur(${CONFIG.blurAmount}px);
                 transform: scale(1.05); /* Prevent blur edges from showing */
+                transition: opacity 0.3s ease-in-out; /* Add transition for smoother appearance */
+                will-change: background-image, opacity; /* Hint browser to optimize these properties */
             }
 
             body {
@@ -842,18 +781,6 @@
                 GM_addStyle(defaultCSS);
             }
 
-            // Remove the initial document-start blocking style
-            const initialBlock = document.getElementById('ptp-fanart-initial-block');
-            if (initialBlock && initialBlock.parentNode) {
-                initialBlock.parentNode.removeChild(initialBlock);
-            }
-
-            // Remove the early spinner
-            const earlySpinner = document.getElementById('ptp-fanart-spinner-early');
-            if (earlySpinner && earlySpinner.parentNode) {
-                earlySpinner.parentNode.removeChild(earlySpinner);
-            }
-
             // Fade out overlay and spinner
             const initialStyles = document.getElementById('ptp-fanart-initial-styles');
             if (initialStyles) {
@@ -890,12 +817,6 @@
                     body::before, body::after, #ptp-fanart-spinner {
                         animation: hideCompletely 0s 1.3s forwards;
                     }
-
-                    /* Show content containers */
-                    #wrapper, #content, .site-logo__link, .page__main-content, .user-info-bar {
-                        opacity: 1 !important;
-                        visibility: visible !important;
-                    }
                 `;
             }
 
@@ -911,6 +832,13 @@
 
     // Preload an image and return a promise
     function preloadImage(url) {
+        // Add a preload link to hint the browser to prioritize this resource
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'image';
+        preloadLink.href = url;
+        document.head.appendChild(preloadLink);
+        
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(url);
@@ -985,89 +913,127 @@
     }
 
     // Main execution
-    function init() {
-        log('Initializing PTP Fanart script');
-        
-        // Get IMDb ID from the page
-        const imdbId = getImdbId();
-        
-        if (!imdbId) {
-            log('No IMDb ID found on page');
-            showContent();
-            return;
+    async function init() {
+        console.log('PING');
+        try {
+            // Try to get the current URL to use as a cache key base
+            const pageUrl = window.location.href;
+            const cacheKeyBase = pageUrl.split('?')[0] + (pageUrl.match(/id=(\d+)/) ? pageUrl.match(/id=(\d+)/)[1] : '');
+
+            // First check if we have a cached background URL - if so, apply it immediately 
+            // while we fetch the rest of the data to provide instant visual feedback
+            const cachedBackgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
+            if (cachedBackgroundUrl) {
+                log('Found cached background URL, applying immediately');
+                applyBackground(cachedBackgroundUrl);
+            }
+
+            // First, check if we have cached TVDB ID
+            let imdbId = getCachedData(`${cacheKeyBase}_imdbId`);
+
+            if (!imdbId) {
+                // If not cached, fetch the TVDB ID
+                imdbId = await getImdbId();
+                if (imdbId) {
+                    // Cache the TVDB ID for future use
+                    setCachedData(`${cacheKeyBase}_imdbId`, imdbId);
+                }
+            }
+
+            // Check for cached artwork data
+            let artworkData = getCachedData(`${cacheKeyBase}_artwork`);
+
+            if (!artworkData && imdbId) {
+                // If not cached, fetch the artwork data
+                artworkData = await fetchArtwork(imdbId);
+                if (artworkData) {
+                    // Cache the artwork data for future use
+                    setCachedData(`${cacheKeyBase}_artwork`, artworkData);
+                }
+            }
+
+            // Get background and logo URLs from fanart.tv
+            let backgroundUrls = artworkData ? getBestBackground(artworkData) : null;
+            const logoUrl = artworkData && CONFIG.replaceSiteLogo ? getBestLogo(artworkData) : null;
+
+            // Select a random background from the available options
+            let backgroundUrl = null;
+            if (backgroundUrls && backgroundUrls.length > 0) {
+                // Pick a random background from the available ones
+                backgroundUrl = backgroundUrls[Math.floor(Math.random() * backgroundUrls.length)];
+                
+                // Store last used background URL in cache
+                if (backgroundUrl) {
+                    setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
+                }
+            } else if (!cachedBackgroundUrl) {
+                // Fallback to cached background only if we don't have one already applied
+                backgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
+            }
+
+            // Array to hold preload promises
+            const preloadPromises = [];
+
+            // Track if logo was successfully applied
+            let logoApplied = false;
+            
+            // Apply background if we have a new URL and haven't already applied a cached one,
+            // or if the new URL is different from the cached one we already applied
+            if (backgroundUrl && (!cachedBackgroundUrl || backgroundUrl !== cachedBackgroundUrl)) {
+                preloadPromises.push(
+                    preloadImage(backgroundUrl)
+                    .then(() => {
+                        applyBackground(backgroundUrl);
+                        console.log('PTP Fanart: Background applied successfully');
+                    })
+                    .catch(error => {
+                        console.error('PTP Fanart: Failed to preload background', error);
+                    })
+                );
+            }
+            // Preload logo image if available
+            if (logoUrl) {
+                preloadPromises.push(
+                    preloadImage(logoUrl)
+                    .then(() => {
+                        logoApplied = replaceSiteLogo(logoUrl);
+                        console.log('PTP Fanart: Logo replaced successfully');
+                    })
+                    .catch(error => {
+                        console.error('PTP Fanart: Failed to preload logo', error);
+                    })
+                );
+            }
+
+            // If we're showing content after images load, wait for preloads to complete
+            if (CONFIG.hideUntilLoaded && preloadPromises.length > 0) {
+                await Promise.allSettled(preloadPromises);
+                // Show content once everything is done
+                showContent(logoApplied);
+            } else {
+                // Otherwise show content immediately and let images load in background
+                // Wait a small amount of time to ensure basic styling is applied
+                setTimeout(() => {
+                    showContent(logoApplied);
+                }, 100);
+                
+                // Still track completion in background
+                Promise.allSettled(preloadPromises).then(() => {
+                    log('All image preloads complete or failed');
+                });
+            }
+
+        } catch (error) {
+            console.error('PTP Fanart: Error in init', error);
+            showContent(); // Show content even if there's an error
         }
-        
-        log('Found IMDb ID:', imdbId);
-        
-        // Fetch artwork
-        fetchArtwork(imdbId)
-            .then(data => {
-                if (!data) {
-                    log('No artwork data found');
-                    showContent();
-                    return;
-                }
-                
-                // Get background image and logo
-                const backgroundImage = getBestBackground(data);
-                const logoImage = CONFIG.replaceSiteLogo ? getBestLogo(data) : null;
-                
-                log('Background image:', backgroundImage ? '✓ Found' : '✗ Not found');
-                log('Logo image:', logoImage ? '✓ Found' : '✗ Not found');
-                
-                // Apply background if available
-                if (backgroundImage) {
-                    return preloadImage(backgroundImage)
-                        .then(() => {
-                            applyBackground(backgroundImage);
-                            
-                            // Replace logo if available and option is enabled
-                            if (logoImage && CONFIG.replaceSiteLogo) {
-                                return preloadImage(logoImage)
-                                    .then(() => {
-                                        replaceSiteLogo(logoImage);
-                                        showContent();
-                                    })
-                                    .catch(error => {
-                                        log('Error preloading logo:', error);
-                                        showContent();
-                                    });
-                            } else {
-                                showContent();
-                            }
-                        })
-                        .catch(error => {
-                            log('Error preloading background:', error);
-                            showContent();
-                        });
-                } else {
-                    // If no background image, try to just replace the logo
-                    if (logoImage && CONFIG.replaceSiteLogo) {
-                        return preloadImage(logoImage)
-                            .then(() => {
-                                replaceSiteLogo(logoImage);
-                                showContent();
-                            })
-                            .catch(error => {
-                                log('Error preloading logo:', error);
-                                showContent();
-                            });
-                    } else {
-                        showContent();
-                    }
-                }
-            })
-            .catch(error => {
-                log('Error fetching artwork:', error);
-                showContent();
-            });
     }
 
     // Start script execution immediately
-    function waitForTvdbOrBanner() {
-        // Try to find TVDB link or banner immediately
-        const imdbLink = document.querySelector('a[href*="imdb.com/title/tt"]');
-        
+    function waitForImdb() {
+        // Try to find IMDB link
+        const imdbLink = document.querySelector('#imdb-title-link');
+        console.log('PTP Fanart: IMDB link:', imdbLink);
         if (imdbLink) {
             // Elements already exist, start immediately
             init();
@@ -1076,10 +1042,10 @@
         
         // Set up mutation observer to watch for these elements
         const observer = new MutationObserver((mutations, obs) => {
-            const imdbLink = document.querySelector('a[href*="imdb.com/title/tt"]');
-            
+            const imdbLink = document.querySelector('#imdb-title-link');
             if (imdbLink) {
                 obs.disconnect(); // Stop observing once found
+                console.log('PTP Fanart: IMDB link:', imdbLink);
                 init();
             }
         });
@@ -1097,13 +1063,13 @@
         // Fallback: Start after a timeout even if elements aren't found
         setTimeout(() => {
             observer.disconnect();
-            if (!document.querySelector('a[href*="imdb.com/title/tt"]')) {
-                console.log('PTP Fanart: Timeout waiting for TVDB link or banner, starting anyway');
+            if (!document.querySelector('#imdb-title-link')) {
+                console.log('PTP Fanart: Timeout waiting for IMDB link, starting anyway');
                 init();
             }
         }, 5000);
     }
     
     // Start immediately
-    waitForTvdbOrBanner();
+    waitForImdb();
 })();
