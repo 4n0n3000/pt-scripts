@@ -5,8 +5,8 @@
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @homepageURL  https://passthepopcorn.me/forums.php?action=viewthread&threadid=45302
-// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/ptp_fanart.js
-// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/ptp_fanart.js
+// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/ptp_fanart.user.js
+// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/ptp_fanart.user.js
 // @match        *://passthepopcorn.me/torrents.php?id=*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue

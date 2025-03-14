@@ -5,8 +5,8 @@
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @homepageURL  https://broadcasthe.net/forums.php?action=viewthread&threadid=37652
-// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/btn_fanart.js
-// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/btn_fanart.js
+// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/btn_fanart.user.js
+// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/btn_fanart.user.js
 // @match        *://broadcasthe.net/series.php?id=*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
