@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.6
+// @version      1.1.7
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -119,27 +119,27 @@
                     saveButton.classList.add('success');
                     setTimeout(() => saveButton.classList.remove('success'), 500);
                 });
-                
+
                 // Group checkboxes with visual styling
                 const checkboxSections = [
-                    'replaceSiteLogo', 
-                    'hideUntilLoaded', 
+                    'replaceSiteLogo',
+                    'hideUntilLoaded',
                     'enableDebug'
                 ];
-                
+
                 checkboxSections.forEach(field => {
                     const checkboxVar = doc.getElementById(`BTN_Fanart_Config_${field}_var`);
                     if (checkboxVar) {
                         checkboxVar.classList.add('checkbox-section');
                     }
                 });
-                
+
                 // Group slider controls with visual styling
                 const sliderSections = [
                     'blurAmount',
                     'darkOverlayOpacity'
                 ];
-                
+
                 sliderSections.forEach(field => {
                     const sliderVar = doc.getElementById(`BTN_Fanart_Config_${field}_var`);
                     if (sliderVar) {
@@ -158,7 +158,7 @@
                 console.log('BTN Fanart: Cleared cache data after settings change');
             },
             "reset": function () {
-                // Handle reset functionality 
+                // Handle reset functionality
                 if (typeof resetToDefaults === 'function') {
                     resetToDefaults();
                 }
@@ -363,7 +363,7 @@
 
     // Get settings values with fallbacks to default values
     const FANART_API_KEY = GM_config.get('FANART_API_KEY') || 'ABCD1234';
-    
+
     // Configuration options
     const CONFIG = {
         replaceSiteLogo: GM_config.get('replaceSiteLogo') !== undefined ? GM_config.get('replaceSiteLogo') : true,
@@ -442,7 +442,7 @@
                     animation: spin 1s ease-in-out infinite;
                 }
             `;
-            
+
             // Handle the case where document.head doesn't exist yet
             const addStyle = () => {
                 if (document.head) {
@@ -454,14 +454,14 @@
                     }, { once: true });
                 }
             };
-            
+
             addStyle();
 
             // Add spinner element to the body when it's available
             const addSpinner = () => {
                 const spinner = document.createElement('div');
                 spinner.id = 'btn-fanart-spinner';
-                
+
                 if (document.body) {
                     document.body.appendChild(spinner);
                 } else {
@@ -471,7 +471,7 @@
                     }, { once: true });
                 }
             };
-            
+
             addSpinner();
         }
     }
@@ -660,6 +660,17 @@
             #userinfo {
                 background-color: #272727d1;
             }
+            
+            #top10 table tr:nth-child(2n+1), #torrents #content > .thin > table tr:nth-child(2n+1), #showslist table tr:nth-child(2n+1), #serieslist table tr:nth-child(2n+1), #snatchlist table tr:nth-child(2n+1), #userhistory table tr:nth-child(2n+1), #friends table tr:nth-child(2n+1), #inbox table tr:nth-child(2n+1), #user table tr:nth-child(2n+1), #bonus table tr:nth-child(2n+1), #staff table tr:nth-child(2n+1), #staffpm table tr:nth-child(2n+1), #rules table tr:nth-child(2n+1), #recommend table tr:nth-child(2n+1), #forums .thin > table tr:nth-child(2n+1), #forums .thin > form > table tr:nth-child(2n+1), #requests table tr:nth-child(2n+1), #collages table tr:nth-child(2n+1), #nfo table tr:nth-child(2n+1), #unofficial table tr:nth-child(2n+1), #series .main_column table:not(.torrent_table) tr:nth-child(2n+1), #content:has(.main_column > table#discog_table) .main_column table:not(.torrent_table) tr:nth-child(2n+1), #series .sidebar .stats table tr:nth-child(2n+1), #content:has(.main_column > table#discog_table) .sidebar .stats table tr:nth-child(2n+1), #series .sidebar .box form table tr:nth-child(2n+1), #content:has(.main_column > table#discog_table) .sidebar .box form table tr:nth-child(2n+1), #series #content > .thin > table tr:nth-child(2n+1), #content:has(.main_column > table#discog_table) #content > .thin > table tr:nth-child(2n+1), #tvfavs table tr:nth-child(2n+1), #tvnews table tr:nth-child(2n+1), #newsletter table tr:nth-child(2n+1), #upload table tr:nth-child(2n+1), .filter_torrents table tr:nth-child(2n+1), .torrent_table table tr:nth-child(2n+1), .torrent_table tr:nth-child(2n+1) {
+                background-color: #272727ab;
+            }
+            #top10 table tr:nth-child(2n), #torrents #content > .thin > table tr:nth-child(2n), #showslist table tr:nth-child(2n), #serieslist table tr:nth-child(2n), #snatchlist table tr:nth-child(2n), #userhistory table tr:nth-child(2n), #friends table tr:nth-child(2n), #inbox table tr:nth-child(2n), #user table tr:nth-child(2n), #bonus table tr:nth-child(2n), #staff table tr:nth-child(2n), #staffpm table tr:nth-child(2n), #rules table tr:nth-child(2n), #recommend table tr:nth-child(2n), #forums .thin > table tr:nth-child(2n), #forums .thin > form > table tr:nth-child(2n), #requests table tr:nth-child(2n), #collages table tr:nth-child(2n), #nfo table tr:nth-child(2n), #unofficial table tr:nth-child(2n), #series .main_column table:not(.torrent_table) tr:nth-child(2n), #content:has(.main_column > table#discog_table) .main_column table:not(.torrent_table) tr:nth-child(2n), #series .sidebar .stats table tr:nth-child(2n), #content:has(.main_column > table#discog_table) .sidebar .stats table tr:nth-child(2n), #series .sidebar .box form table tr:nth-child(2n), #content:has(.main_column > table#discog_table) .sidebar .box form table tr:nth-child(2n), #series #content > .thin > table tr:nth-child(2n), #content:has(.main_column > table#discog_table) #content > .thin > table tr:nth-child(2n), #tvfavs table tr:nth-child(2n), #tvnews table tr:nth-child(2n), #newsletter table tr:nth-child(2n), #upload table tr:nth-child(2n), .filter_torrents table tr:nth-child(2n), .torrent_table table tr:nth-child(2n), .torrent_table tr:nth-child(2n) {
+                background-color: #2B2B2Bab;
+            }
+            
+            .box {
+                background-color: #272727ab;
+            }
         `;
 
         const styleElement = document.createElement('style');
@@ -783,7 +794,7 @@
         preloadLink.as = 'image';
         preloadLink.href = url;
         document.head.appendChild(preloadLink);
-        
+
         return new Promise((resolve, reject) => {
             const img = new Image();
             img.onload = () => resolve(url);
@@ -799,7 +810,7 @@
             const pageUrl = window.location.href;
             const cacheKeyBase = pageUrl.split('?')[0] + (pageUrl.match(/id=(\d+)/) ? pageUrl.match(/id=(\d+)/)[1] : '');
 
-            // First check if we have a cached background URL - if so, apply it immediately 
+            // First check if we have a cached background URL - if so, apply it immediately
             // while we fetch the rest of the data to provide instant visual feedback
             const cachedBackgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
             if (cachedBackgroundUrl) {
@@ -840,7 +851,7 @@
             if (backgroundUrls && backgroundUrls.length > 0) {
                 // Pick a random background from the available ones
                 backgroundUrl = backgroundUrls[Math.floor(Math.random() * backgroundUrls.length)];
-                
+
                 // Store last used background URL in cache
                 if (backgroundUrl) {
                     setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
@@ -860,7 +871,7 @@
                     // Get the first fanart image href
                     backgroundUrl = fanartImages[0].src;
                     console.log('BTN Fanart: Found page background image:', backgroundUrl);
-                    
+
                     // Cache this found image URL
                     if (backgroundUrl) {
                         setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
@@ -873,7 +884,7 @@
                     if (bannerImg && bannerImg.src) {
                         backgroundUrl = bannerImg.src;
                         console.log('BTN Fanart: Using banner image as background:', backgroundUrl);
-                        
+
                         // Cache this found banner URL
                         setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
                     }
@@ -907,7 +918,7 @@
                     preloadImage(logoUrl)
                     .then(() => {
                         logoApplied = replaceSiteLogo(logoUrl);
-                        
+
                         // Cache the successful logo URL for faster loading on revisits
                         setCachedData(`${cacheKeyBase}_logoUrl`, logoUrl);
                         console.log('BTN Fanart: Logo replaced successfully');
@@ -929,7 +940,7 @@
                 setTimeout(() => {
                     showContent(logoApplied);
                 }, 100);
-                
+
                 // Still track completion in background
                 Promise.allSettled(preloadPromises).then(() => {
                     log('All image preloads complete or failed');
@@ -941,30 +952,30 @@
             showContent(); // Show content even if there's an error
         }
     }
-    
+
     // Start immediately
     function waitForTvdbOrBanner() {
         // Try to find TVDB link or banner immediately
         const tvdbLink = document.querySelector('a[href*="thetvdb.com"]');
         const bannerImg = document.querySelector('#banner');
-        
+
         if (tvdbLink || bannerImg) {
             // Elements already exist, start immediately
             init();
             return;
         }
-        
+
         // Set up mutation observer to watch for these elements
         const observer = new MutationObserver((mutations, obs) => {
             const tvdbLink = document.querySelector('a[href*="thetvdb.com"]');
             const bannerImg = document.querySelector('#banner');
-            
+
             if (tvdbLink || bannerImg) {
                 obs.disconnect(); // Stop observing once found
                 init();
             }
         });
-        
+
         // Start observing as soon as body is available
         if (document.body) {
             observer.observe(document.body, { childList: true, subtree: true });
@@ -974,7 +985,7 @@
                 observer.observe(document.body, { childList: true, subtree: true });
             }, { once: true });
         }
-        
+
         // Fallback: Start after a timeout even if elements aren't found
         setTimeout(() => {
             observer.disconnect();
@@ -984,7 +995,7 @@
             }
         }, 5000);
     }
-    
+
     // Start immediately
     waitForTvdbOrBanner();
 })();
