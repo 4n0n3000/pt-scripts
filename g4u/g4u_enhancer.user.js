@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.2
+// @version      1.0.3
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -10,6 +10,7 @@
 // @homepageURL  https://github.com/4n0n3000/pt-scripts
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/g4u/g4u_enhancer.user.js
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/g4u/g4u_enhancer.user.js
+// @require      https://cdn.jsdelivr.net/gh/sizzlemctwizzle/GM_config@43fd0fe4de1166f343883511e53546e87840aeaf/gm_config.js
 // @run-at       document-start
 // ==/UserScript==
 
@@ -26,6 +27,100 @@
             };
         }
     });
+
+    // Check if we're on a game page
+    function isOnGamePage() {
+        const regex = /^https:\/\/g4u\.to\/..\/\d.*/;
+        return regex.test(window.location.href);
+    }
+
+
+    function usenetMode(isUsenetModeEnabled) {
+        const nonUsenet = [
+            'ddownload.com',
+            'rapidgator.net',
+            'katfile.com',
+            'gofile.io'
+        ];
+
+        nonUsenet.forEach(host => {
+            document.querySelectorAll(`img[alt="${host}"]`).forEach(img => {
+                const tableRow = img.closest('tr');
+                if (tableRow) {
+                    if (isUsenetModeEnabled) {
+                        // Hide the row when Usenet mode is enabled
+                        tableRow.style.display = 'none';
+                    } else {
+                        // Show the row when Default mode is enabled
+                        tableRow.style.display = '';
+                    }
+                }
+            });
+        });
+    }
+
+    function addUsenetModeToggle() {
+        // Only proceed if we're on the correct page
+        if (!isOnGamePage()) {
+            return;
+        }
+
+        // Create the Usenet Mode toggle button
+        const usenet_toggleButton = document.createElement('button');
+        usenet_toggleButton.textContent = '🧠 NZB Mode';
+        usenet_toggleButton.className = 'usenet-mode-toggle w3-button w3-round w3-small';
+        usenet_toggleButton.style.position = 'relative';
+        usenet_toggleButton.style.opacity = '0.8';
+
+        // Check if dark mode is already enabled from localStorage
+        const isUsenetMode = localStorage.getItem('g4u-usenet-mode') === 'true';
+
+        // Apply Usenet mode if it was previously enabled
+        if (isUsenetMode) {
+            document.body.classList.add('usenet-mode');
+            usenetMode(isUsenetMode)
+            usenet_toggleButton.textContent = '🧠 NZB Mode';
+        } else {
+            usenet_toggleButton.textContent = '💩 DDL + NZB Mode';
+        }
+
+        // Add click event to toggle dark mode
+        usenet_toggleButton.addEventListener('click', function() {
+            const isUsenetModeEnabled = document.body.classList.toggle('usenet-mode');
+            usenetMode(isUsenetModeEnabled)
+            localStorage.setItem('g4u-usenet-mode', isUsenetModeEnabled ? 'true' : 'false');
+            // Update button text
+            usenet_toggleButton.textContent = isUsenetModeEnabled ? '🧠 NZB Mode' : '💩 DDL + NZB Mode';
+        });
+
+        // Add the button to the page
+
+        // Create a new table row
+        const newRow = document.createElement('tr');
+
+        // Create a table cell to contain the button
+        const newCell = document.createElement('td');
+        newCell.colSpan = 3; // Make the cell span across all columns
+        newCell.style.textAlign = "center"; // Center the content
+
+        // Add the button to the cell
+        newCell.appendChild(usenet_toggleButton);
+
+        // Add the cell to the row
+        newRow.appendChild(newCell);
+
+        // Find the tbody and add the new row at the end
+        const tbody = document.querySelector('.w3-table-all > tbody');
+        if (tbody) {
+            // Append to the end of the tbody
+            tbody.appendChild(newRow);
+        } else {
+            // Fallback if tbody not found
+            document.body.appendChild(usenet_toggleButton);
+        }
+
+    }
+
 
     // Function to remove promotional elements
     function removePromotionalElements() {
@@ -84,7 +179,6 @@
             }
         });
 
-        // Delete freediscussions.com (Usenet)
         // Delete freediscussions.com (Usenet)
         document.querySelectorAll('img[alt="freediscussions.com"]').forEach(img => {
             const tableRow = img.closest('tr');
@@ -160,7 +254,7 @@
         toggleButton.textContent = '🌙 Dark Mode';
         toggleButton.className = 'dark-mode-toggle w3-button w3-round w3-small';
         toggleButton.style.position = 'fixed';
-        toggleButton.style.bottom = '20px';
+        toggleButton.style.bottom = '60px';
         toggleButton.style.right = '20px';
         toggleButton.style.zIndex = '1000';
         toggleButton.style.padding = '8px 16px';
@@ -217,7 +311,10 @@
             background-color: #1e1e1e;
             color: #e0e0e0;
         }
-
+        
+        body.dark-mode .usenet-mode-toggle {
+            #e0e0e0;
+        }
         body.dark-mode .w3-card,
         body.dark-mode .w3-card-2,
         body.dark-mode .w3-card-4 {
@@ -244,6 +341,10 @@
             color: #e0e0e0;
         }
 
+        body.dark-mode .w3-striped tbody tr:nth-child(even) {
+            background-color: #333;
+        }
+        
         body.dark-mode .w3-striped tbody tr:nth-child(even) {
             background-color: #333;
         }
@@ -358,6 +459,7 @@
             // Add dark mode functionality
             addDarkModeCSS();
             addDarkModeToggle();
+            addUsenetModeToggle();
         });
     } else {
         removePromotionalElements();
@@ -366,6 +468,7 @@
         // Add dark mode functionality
         addDarkModeCSS();
         addDarkModeToggle();
+        addUsenetModeToggle();
     }
 
     // Create a MutationObserver to handle dynamically added elements
