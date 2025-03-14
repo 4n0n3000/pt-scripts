@@ -293,8 +293,8 @@ body pre {
 
 body {
     text-align: left;
-    line-height: 1.2rem;
-    word-wrap: break-word;
+    line-height: 1.1rem;
+    word-wrap: anywhere;
     background: #1D1D1D url("https://ptpimg.me/z74g9y.png") repeat top center fixed;
     background-size: 60%;
     margin: 0 auto
@@ -5120,5 +5120,13 @@ script+.leftbar img {
 }
 
 .tvshows td img {
-    width: 287px;
+    width: 287px !important;
+}
+
+.box, .pad {
+    padding: 10px !important;
+}
+
+.group, .discog {
+    width: 15% !important;
 }
