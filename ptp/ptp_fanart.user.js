@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.5
+// @version      1.1.6
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
