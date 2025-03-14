@@ -196,7 +196,7 @@
 
         /* Dark mode overrides for W3.CSS */
         body.dark-mode .w3-white {
-            background-color: #fff0 !important;
+            background-color: #1e1e1e !important;
             color: #e0e0e0 !important;
         }
 
