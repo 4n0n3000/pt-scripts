@@ -33,7 +33,6 @@ a {
 
 abbr[title] {
     border-bottom: none;
-    text-decoration: underline;
     text-decoration: underline dotted
 }
 
@@ -3878,7 +3877,7 @@ script+.leftbar img {
 
 #content:has(.main_column>table#discog_table) .thin>center>div h2 img,
 #series .thin>center>div h2 img {
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 150%);
+    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 150%);
     mask-image: linear-gradient(to top, transparent 0%, black 150%);
     transform: scale(1.5);
     transform-origin: top;
@@ -4023,7 +4022,7 @@ script+.leftbar img {
 }
 
 #torrents .thin>h2 img {
-    -webkit-mask-image: linear-gradient(to top, transparent 0%, black 150%);
+    -webkit-mask-image: -webkit-linear-gradient(to top, transparent 0%, black 150%);
     mask-image: linear-gradient(to top, transparent 0%, black 150%);
     transform: scale(1.5);
     transform-origin: top;
