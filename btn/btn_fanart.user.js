@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.2
+// @version      1.1.3
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -506,107 +506,8 @@
         GM_setValue(key, JSON.stringify(cacheData));
     }
 
-    // Get the TVDB URL from the page
-    function getTvdbUrl() {
-        // First try the modern format: thetvdb.com/series/[slug]
-        const tvdbModernLinks = document.querySelectorAll('a[href*="thetvdb.com/series/"]');
-        if (tvdbModernLinks && tvdbModernLinks.length > 0) {
-            return tvdbModernLinks[0].href;
-        }
-
-        // Try the legacy format: thetvdb.com/?tab=series&id=[id]
-        const tvdbLegacyLinks = document.querySelectorAll('a[href*="thetvdb.com/?tab=series"]');
-        if (tvdbLegacyLinks && tvdbLegacyLinks.length > 0) {
-            return tvdbLegacyLinks[0].href;
-        }
-
-        return null;
-    }
-
-    // Fetch the TVDB ID by scraping the TVDB page
-    async function fetchTvdbId(tvdbUrl) {
-        // Check if this is a legacy URL with query parameters
-        if (tvdbUrl.includes('?tab=series&id=')) {
-            // Direct extraction from URL
-            const match = tvdbUrl.match(/[?&]id=(\d+)/);
-            if (match && match[1]) {
-                return Promise.resolve(match[1]);
-            }
-        }
-
-        return new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-                method: 'GET',
-                url: tvdbUrl,
-                onload: function(response) {
-                    if (response.status === 200) {
-                        const parser = new DOMParser();
-                        const htmlDoc = parser.parseFromString(response.responseText, 'text/html');
-
-                        // Method 1: Use the specific CSS selector for the ID
-                        const idElement = htmlDoc.querySelector('li.list-group-item:nth-child(1) > span:nth-child(2)');
-                        if (idElement && idElement.textContent) {
-                            const id = idElement.textContent.trim();
-                            if (/^\d+$/.test(id)) {
-                                return resolve(id);
-                            }
-                        }
-
-                        // Method 2: Try to find the ID in meta tags
-                        const metaTags = htmlDoc.querySelectorAll('meta[property="og:url"], meta[property="al:ios:url"]');
-                        for (const tag of metaTags) {
-                            const content = tag.getAttribute('content');
-                            if (content) {
-                                const match = content.match(/\/(\d+)$/);
-                                if (match && match[1]) {
-                                    return resolve(match[1]);
-                                }
-                            }
-                        }
-
-                        // Method 3: Look for data attributes in the HTML
-                        const elements = htmlDoc.querySelectorAll('[data-id]');
-                        for (const el of elements) {
-                            const id = el.getAttribute('data-id');
-                            if (id && /^\d+$/.test(id)) {
-                                return resolve(id);
-                            }
-                        }
-
-                        // Method 4: Check for a series ID in the script tags
-                        const scripts = htmlDoc.querySelectorAll('script');
-                        for (const script of scripts) {
-                            const text = script.textContent;
-                            // Look for patterns like "id":12345 or "id": 12345
-                            const match = text.match(/"id"\s*:\s*(\d+)/);
-                            if (match && match[1]) {
-                                return resolve(match[1]);
-                            }
-                        }
-
-                        reject('Could not find TVDB ID on the page');
-                    } else {
-                        reject(`Failed to load TVDB page: ${response.status}`);
-                    }
-                },
-                onerror: function(error) {
-                    reject(error);
-                }
-            });
-        });
-    }
-
     // Get TVDB ID from the page
     async function getTvdbId() {
-        const tvdbUrl = getTvdbUrl();
-        if (tvdbUrl) {
-            try {
-                const tvdbId = await fetchTvdbId(tvdbUrl);
-                return tvdbId;
-            } catch (error) {
-                console.error('BTN Fanart: Error fetching TVDB ID', error);
-            }
-        }
 
         // As a fallback, check for tvdb ID in banner image URLs
         const bannerImg = document.querySelector('#banner');

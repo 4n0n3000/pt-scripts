@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.4
+// @version      1.1.5
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -884,7 +884,8 @@
         // Add resize event listener to adjust margin when window size changes
         window.addEventListener('resize', adjustLogoMargin);
 
-        // console.log('PTP Fanart: Site logo replaced successfully');
+        console.log('PTP Fanart: Site logo replaced successfully');
+        return true;
     }
 
     // Function to adjust the site logo margin based on user-info-bar height
@@ -997,7 +998,6 @@
                     preloadImage(logoUrl)
                     .then(() => {
                         logoApplied = replaceSiteLogo(logoUrl);
-                        console.log('PTP Fanart: Logo replaced successfully');
                     })
                     .catch(error => {
                         console.error('PTP Fanart: Failed to preload logo', error);
