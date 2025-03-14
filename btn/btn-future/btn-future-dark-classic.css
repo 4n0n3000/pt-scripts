@@ -2451,7 +2451,7 @@ ul.navigation.navigation a.selected {
 
 .midbar #slider .scroll {
     border-top: 0;
-    width: 933px
+    width: 798px
 }
 
 @media (max-width: 1236px) {
@@ -2467,7 +2467,7 @@ ul.navigation.navigation a.selected {
 }
 
 #slider .scroll .scrollContainer div.panel {
-    margin: 0 5px
+    margin: 0
 }
 
 #slider div.panel {
@@ -2475,12 +2475,12 @@ ul.navigation.navigation a.selected {
 }
 
 .midbar #slider div.panel {
-    width: 922px
+    width: 798px
 }
 
 @media (max-width: 1236px) {
     .midbar #slider div.panel {
-        width: 690px
+        width: 798px
     }
 
     .midbar #slider div.panel .tvshows .pad:last-of-type img {
@@ -5117,4 +5117,8 @@ script+.leftbar img {
 
 #unofficial #post {
     margin-top: 15px
+}
+
+.tvshows td img {
+    width: 287px;
 }
