@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.8
+// @version      1.1.9
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -89,13 +89,19 @@
                 'type': 'checkbox',
                 'default': false,
                 'title': 'Enable console logging for debugging'
+            },
+            'hideSeasonsByDefault': {
+                'label': 'Hide Seasons By Default',
+                'type': 'checkbox',
+                'default': false,
+                'title': 'Automatically hide all season sections when page loads'
             }
         },
         "events": {
             "open": function (doc) {
                 let style = this.frame.style;
                 style.width = "420px";
-                style.height = "630px";
+                style.height = "654px";
                 style.inset = "";
                 style.top = "2%";
                 style.right = "6%";
@@ -902,6 +908,24 @@
         });
     }
 
+    function applySeasonsToggle() {
+        // Check if the hide seasons by default setting is enabled
+        const hideSeasonsByDefault = GM_config.get('hideSeasonsByDefault');
+
+        if (hideSeasonsByDefault) {
+            // Find all toggle links
+            const toggleLinks = document.querySelectorAll('a.toggle');
+
+            // Click each toggle link that says "hide" to collapse the seasons
+            toggleLinks.forEach(link => {
+                if (link.textContent === 'hide') {
+                    link.click();
+                }
+            });
+        }
+    }
+
+
     // Main execution
     async function init() {
         try {
@@ -1045,6 +1069,8 @@
                     log('All image preloads complete or failed');
                 });
             }
+
+            applySeasonsToggle();
 
         } catch (error) {
             console.error('BTN Fanart: Error in init', error);
