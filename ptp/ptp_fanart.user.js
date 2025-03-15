@@ -370,7 +370,7 @@
 
     // Get settings values with fallbacks to default values
     const FANART_API_KEY = GM_config.get('FANART_API_KEY') || 'ABCD1234';
-    
+
     // Configuration options
     const CONFIG = {
         replaceSiteLogo: GM_config.get('replaceSiteLogo') !== undefined ? GM_config.get('replaceSiteLogo') : true,
@@ -392,13 +392,69 @@
     };
 
     // Log settings if debug is enabled
-    log('Script initialized with settings:', { 
-        FANART_API_KEY: FANART_API_KEY ? '✓ Set' : '✗ Not set', 
-        CONFIG 
+    log('Script initialized with settings:', {
+        FANART_API_KEY: FANART_API_KEY ? '✓ Set' : '✗ Not set',
+        CONFIG
     });
 
     // Unused Default CSS for future use
-    const defaultCSS = ``
+    const defaultCSS = `
+        .forum-post {
+            background-color: #2f354669;
+            backdrop-filter: brightness(0.8);
+        }
+        
+        .group_torrent.PTP-ResHeader, .forum-post__heading, .forum-post__movie-vote, .panel__heading {
+            background-color: rgba(7, 11, 22, 0.60) !important;
+            backdrop-filter: brightness(1);
+        }
+        
+        .group_torrent {
+            background-color: #2f354669 !important;
+            backdrop-filter: brightness(0.8);
+        }
+        
+        .panel {
+            background-color: #2f354669 !important;
+            backdrop-filter: brightness(0.8);
+        }
+        
+        .search-bar__search-field__input {
+            background-color: #0b0e1ae0;
+            backdrop-filter: brightness(1);
+        }
+        
+        .table > tbody > tr, .table > thead > tr {
+            background-color: #2f354669 !important;
+            backdrop-filter: brightness(0.8);
+        }
+        
+        .movie-page__torrent__panel {
+            background-color: #181c2799;
+            backdrop-filter: brightness(0.8);
+        }
+
+        
+        #PTP-Groupies-Menu {
+            margin: 1em 0 1em 0;
+        }
+        
+        .page__main-content {
+            backdrop-filter: blur(5px);
+        }
+        
+        .table--striped > tbody > tr:nth-child(2n+1) > td, .table--striped > tbody > tr:nth-child(2n+1) > th, .table > tbody > tr.movie-page__torrent--highlighted {
+            background-color: #2f354700;
+        }
+        
+        .mediainfo--in-release-description .mediainfo__section > tbody > tr, .mediainfo--in-release-description > tbody > tr {
+            background-color: #242a3c00 !important;
+        }
+        
+        blockquote {
+            background-color: #181c277a;
+        }
+    `
 
     // Audionut Theme CSS
     const audionutCSS = `
