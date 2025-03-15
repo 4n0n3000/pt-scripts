@@ -257,7 +257,7 @@ template {
 body {
     color: #fff;
     font-family: "Open Sans", helvetica, tahoma, arial, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased
@@ -293,7 +293,7 @@ body pre {
 
 body {
     text-align: left;
-    line-height: 1.1rem;
+    line-height: 1.0rem;
     word-wrap: anywhere;
     background: #1D1D1D url("https://ptpimg.me/z74g9y.png") repeat top center fixed;
     background-size: 60%;
@@ -329,7 +329,7 @@ input:not([type="file"]) {
     background-color: #2F2F2F;
     border: 1px solid #373737;
     border-radius: 5px;
-    padding: 8px 8px;
+    padding: 8px 6px;
     color: #C1C1C1;
     font-size: 0.85rem;
     transition: border 250ms
@@ -715,22 +715,22 @@ img[src*="images/read"] {
 
 img[src*="episode-hd.png"] {
     content: url("https://starblaster100.github.io/btn-future/static/icons/torrent-type/hd-episode.png");
-    max-width: 50px
+    max-width: 40px
 }
 
 img[src*="episode-sd.png"] {
     content: url("https://starblaster100.github.io/btn-future/static/icons/torrent-type/sd-episode.png");
-    max-width: 50px
+    max-width: 40px
 }
 
 img[src*="series-hd.png"] {
     content: url("https://starblaster100.github.io/btn-future/static/icons/torrent-type/hd-season.png");
-    max-width: 50px
+    max-width: 40px
 }
 
 img[src*="series-sd.png"] {
     content: url("https://starblaster100.github.io/btn-future/static/icons/torrent-type/sd-season.png");
-    max-width: 50px
+    max-width: 40px
 }
 
 img[src*="smileys/"] {
@@ -1586,7 +1586,7 @@ strong+.code {
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     padding: 10px
 }
 
@@ -1719,7 +1719,7 @@ strong+.code {
     display: flex;
     justify-content: space-evenly;
     list-style: none;
-    padding: 20px 0;
+    padding: 10px 0;
     margin: 0
 }
 
@@ -1836,7 +1836,7 @@ body>.ui-widget-content .ui-state-hover {
 .torrent_table {
     border-spacing: 0;
     border-collapse: collapse;
-    font-size: 14px;
+    font-size: 12px;
     width: 100%
 }
 
@@ -1953,7 +1953,7 @@ body>.ui-widget-content .ui-state-hover {
 .filter_torrents table td,
 .torrent_table table td,
 .torrent_table td {
-    padding: 6px;
+    padding: 4px;
     vertical-align: top
 }
 
@@ -1997,9 +1997,9 @@ body>.ui-widget-content .ui-state-hover {
 #requests .linkbox+table tr td:nth-of-type(2)>a>img,
 #collages .main_column table tr td:nth-of-type(2)>a>img,
 .torrent_table tr td:nth-of-type(2)>a>img {
-    border-radius: 5px;
-    width: 250px;
-    height: 60px
+    border-radius: 3px;
+    width: 235px;
+    height: 45px
 }
 
 #requests .linkbox+table tr td:nth-of-type(3)>a:last-of-type,
@@ -2017,7 +2017,7 @@ body>.ui-widget-content .ui-state-hover {
 #collages .main_column table tr td:nth-of-type(3)>div,
 .torrent_table tr td:nth-of-type(3)>div {
     display: inline-block;
-    max-width: 450px;
+    max-width: 500px;
     overflow: hidden;
     vertical-align: bottom;
     text-overflow: ellipsis;
@@ -3117,7 +3117,7 @@ p img {
 }
 
 #edit_summary .ui-tabs-vertical .ui-tabs-nav li a {
-    padding: 7px
+    padding: 6px 13px
 }
 
 #edit_summary .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
@@ -3909,7 +3909,7 @@ script+.leftbar img {
 
 #content:has(.main_column>table#discog_table) .thin .main_column table tr td,
 #series .thin .main_column table tr td {
-    padding: 6px 10px
+    padding: 6px 6px
 }
 
 #content:has(.main_column>table#discog_table) .thin .main_column>.box:last-of-type .body img,
@@ -5124,9 +5124,32 @@ script+.leftbar img {
 }
 
 .box, .pad {
-    padding: 10px !important;
+    padding: 7px !important;
 }
 
 .group, .discog {
-    width: 15% !important;
+    width: 10% !important;
+}
+
+div#footer {
+    clear: both;
+    font-size: 10px;
+}
+
+#footer > p:nth-child(2) {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+#footer > p:nth-child(3), #footer > p:nth-child(4) {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#userinfo_stats > li:nth-child(3) {
+    display: none;
+}
+
+#userinfo_username {
+    display: none;
 }
