@@ -5136,20 +5136,15 @@ div#footer {
     font-size: 10px;
 }
 
-#footer > p:nth-child(2) {
-    margin-top: 10px;
-    margin-bottom: 0;
-}
-
-#footer > p:nth-child(3), #footer > p:nth-child(4) {
-    margin-top: 0;
-    margin-bottom: 0;
+#footer > p {
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
 }
 
 #userinfo_stats > li:nth-child(3) {
-    display: none;
+    display: none !important;
 }
 
 #userinfo_username {
-    display: none;
+    display: none !important;
 }
