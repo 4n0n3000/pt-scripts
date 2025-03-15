@@ -628,23 +628,28 @@ img[src*="browsetags/report.png"] {
 }
 
 img[src*="browsetags/fast.png"] {
-    content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/ligntning.svg")
+    /*content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/ligntning.svg")*/
+    width: 48px;
 }
 
 img[src*="browsetags/20x.png"] {
-    content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/two-x.svg")
+    /*content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/two-x.svg")*/
+    width: 48px;
 }
 
 img[src*="browsetags/auto.png"] {
-    content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/robot.svg")
+    /*content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/robot.svg")*/
+    width: 48px;
 }
 
 img[src*="browsetags/foreign.png"] {
-    content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/foreign.svg")
+    /*content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/foreign.svg")*/
+    width: 48px;
 }
 
 img[src*="browsetags/new.png"] {
-    content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/new.svg")
+    /*content: url("https://starblaster100.github.io/btn-future/static/icons/browse-tags/new.svg")*/
+    width: 48px;
 }
 
 img[src*="icons/on.png"] {
@@ -2016,7 +2021,7 @@ body>.ui-widget-content .ui-state-hover {
 #requests .linkbox+table tr td:nth-of-type(3)>div,
 #collages .main_column table tr td:nth-of-type(3)>div,
 .torrent_table tr td:nth-of-type(3)>div {
-    display: inline-block;
+    display: block;
     max-width: 500px;
     overflow: hidden;
     vertical-align: bottom;
@@ -2066,7 +2071,7 @@ body>.ui-widget-content .ui-state-hover {
 #requests .linkbox+table tr td:nth-of-type(4) img,
 #collages .main_column table tr td:nth-of-type(4) img,
 .torrent_table tr td:nth-of-type(4) img {
-    margin: 4px auto
+    margin: 0 auto
 }
 
 #requests .linkbox+table tr td:nth-of-type(5),
