@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.3
+// @version      1.0.4
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -40,7 +40,8 @@
             'ddownload.com',
             'rapidgator.net',
             'katfile.com',
-            'gofile.io'
+            'gofile.io',
+            'vikingfile.com'
         ];
 
         nonUsenet.forEach(host => {
