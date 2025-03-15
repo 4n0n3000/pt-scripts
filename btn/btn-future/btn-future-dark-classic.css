@@ -2113,7 +2113,7 @@ body>.ui-widget-content .ui-state-hover {
 #collages .main_column table .number,
 .torrent_table .number {
     text-align: center;
-    width: 40px
+    width: fit-content
 }
 
 @media (max-width: 1236px) {

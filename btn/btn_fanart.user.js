@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.9
+// @version      1.1.10
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -84,24 +84,30 @@
                 'default': 0.5,
                 'title': 'Opacity of dark overlay on background (0-1)'
             },
-            'enableDebug': {
-                'label': 'Enable Debug Mode',
-                'type': 'checkbox',
-                'default': false,
-                'title': 'Enable console logging for debugging'
-            },
             'hideSeasonsByDefault': {
                 'label': 'Hide Seasons By Default',
                 'type': 'checkbox',
                 'default': false,
                 'title': 'Automatically hide all season sections when page loads'
+            },
+            'hideRequestsTable': {
+                'label': 'Hide Requests Table',
+                'type': 'checkbox',
+                'default': false,
+                'title': 'Hide requests tables on series pages'
+            },
+            'enableDebug': {
+                'label': 'Enable Debug Mode',
+                'type': 'checkbox',
+                'default': false,
+                'title': 'Enable console logging for debugging'
             }
         },
         "events": {
             "open": function (doc) {
                 let style = this.frame.style;
                 style.width = "420px";
-                style.height = "654px";
+                style.height = "690px";
                 style.inset = "";
                 style.top = "2%";
                 style.right = "6%";
@@ -908,6 +914,7 @@
         });
     }
 
+    // Function to handle collapsing seasons
     function applySeasonsToggle() {
         // Check if the hide seasons by default setting is enabled
         const hideSeasonsByDefault = GM_config.get('hideSeasonsByDefault');
@@ -925,6 +932,58 @@
         }
     }
 
+    // Function to handle hiding requests
+    function handleSeriesRequestTable() {
+        // Only run on series.php pages (already covered by your existing @match)
+        if (!window.location.href.includes('series.php')) return;
+
+        // Check if the user wants to hide request tables
+        const shouldHideRequestsTable = GM_config.get('hideRequestsTable');
+        if (!shouldHideRequestsTable) return;
+
+        // Find all strong elements with "Request Name" text
+        const requestNameElements = Array.from(document.querySelectorAll('strong')).filter(el =>
+            el.textContent.trim() === 'Request Name'
+        );
+
+        requestNameElements.forEach(element => {
+            // Navigate up to find the table
+            const table = element.closest('table');
+            if (table) {
+                // Create a toggle button
+                const toggleButton = document.createElement('button');
+                toggleButton.textContent = 'Show Requests Table';
+                toggleButton.style.margin = '10px 0';
+                toggleButton.style.padding = '5px 10px';
+                toggleButton.style.cursor = 'pointer';
+                toggleButton.style.display = 'block';
+                toggleButton.style.backgroundColor = '#272727ab';
+                toggleButton.style.color = '#ffffff';
+                toggleButton.style.fontSize = '12px';
+
+                // Add click event to toggle table visibility
+                toggleButton.addEventListener('click', () => {
+                    if (table.style.display === 'none') {
+                        table.style.display = '';
+                        toggleButton.textContent = 'Hide Requests Table';
+                    } else {
+                        table.style.display = 'none';
+                        toggleButton.textContent = 'Show Requests Table';
+                    }
+                });
+
+                // Insert button before the table
+                table.parentNode.insertBefore(toggleButton, table);
+
+                // Initially hide the table
+                table.style.display = 'none';
+
+                if (GM_config.get('enableDebug')) {
+                    console.log('Found and hid requests table on series page:', table);
+                }
+            }
+        });
+    }
 
     // Main execution
     async function init() {
@@ -1071,6 +1130,7 @@
             }
 
             applySeasonsToggle();
+            handleSeriesRequestTable();
 
         } catch (error) {
             console.error('BTN Fanart: Error in init', error);
