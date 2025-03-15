@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.7
+// @version      1.1.8
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -436,7 +436,7 @@
 
         
         #PTP-Groupies-Menu {
-            margin: 1em 0 1em 0;
+            margin: 1em 0 1em 0 !important;
         }
         
         .page__main-content {
