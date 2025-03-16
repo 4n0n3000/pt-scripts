@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.4
+// @version      1.0.5
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -30,7 +30,7 @@
 
     // Check if we're on a game page
     function isOnGamePage() {
-        const regex = /^https:\/\/g4u\.to\/..\/\d.*/;
+        const regex = /^https:\/\/g4u\.to\/..\/\d+-.*/;
         return regex.test(window.location.href);
     }
 
