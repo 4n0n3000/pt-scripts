@@ -5153,3 +5153,7 @@ div#footer {
 #userinfo_username {
     display: none !important;
 }
+
+#quickpost {
+    overflow: inherit !important;
+}
