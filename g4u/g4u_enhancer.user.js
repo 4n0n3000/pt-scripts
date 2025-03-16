@@ -1,6 +1,6 @@
 ﻿// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.5
+// @version      1.0.6
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -185,6 +185,19 @@
             const tableRow = img.closest('tr');
             if (tableRow) {
                 tableRow.remove();
+            }
+        });
+
+        // Remove the "Use a VPN to unlock the streaming & downloading - Signup Now?" advertisement
+        document.querySelectorAll('a').forEach(a => {
+            if (a.textContent.includes('Use a VPN to unlock the streaming & downloading - Signup Now!')) {
+                // Find the parent element and remove it
+                const parent = a.closest('a.w3-block');
+                if (parent) {
+                    parent.remove();
+                } else {
+                    a.remove();
+                }
             }
         });
 
