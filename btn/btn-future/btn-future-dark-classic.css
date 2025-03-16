@@ -257,7 +257,7 @@ template {
 body {
     color: #fff;
     font-family: "Open Sans", helvetica, tahoma, arial, sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased
@@ -1841,7 +1841,7 @@ body>.ui-widget-content .ui-state-hover {
 .torrent_table {
     border-spacing: 0;
     border-collapse: collapse;
-    font-size: 12px;
+    font-size: 13px;
     width: 100%
 }
 
