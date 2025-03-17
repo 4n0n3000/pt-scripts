@@ -6,6 +6,10 @@
 // @match        https://www.scenenzb.org/uploads/*.nfo
 // @match        https://www.bluraynzb.org/uploads/*.nfo
 // @grant        GM.xmlHttpRequest
+// @namespace    https://github.com/4n0n3000/pt-scripts
+// @homepageURL  https://github.com/4n0n3000/pt-scripts
+// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/multi/nfo_viewer.user.js
+// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/multi/nfo_viewer.user.js
 // @run-at       document-start
 // ==/UserScript==
 
@@ -47,15 +51,7 @@
         }
     }
 
-
-
-    // CP437 to Unicode mapping as a single string for better performance
-// Precompiled URL regex for better performance
-// Function to decode CP437 bytes to string (optimized)
-// Cache for processed URL content
     new Map();
-// Function to convert URLs to links with caching
-// Web Worker for heavy processing
     const workerBlob = new Blob([`
         // CP437 string map in worker
         const cp437_string = 
