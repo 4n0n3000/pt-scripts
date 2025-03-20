@@ -5188,3 +5188,7 @@ div#footer {
 .potato-menu-item:hover ul.potato-menu-group {
     transition: none !important;
 }
+
+[id^="torrent_"] > td:nth-child(1) > div:nth-child(2) > table:nth-child(1) {
+    background-color: #262626;
+}
