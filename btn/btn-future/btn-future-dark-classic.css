@@ -329,7 +329,7 @@ input:not([type="file"]) {
     background-color: #2F2F2F;
     border: 1px solid #373737;
     border-radius: 5px;
-    padding: 8px 6px;
+    padding: 8px 8px;
     color: #C1C1C1;
     font-size: 0.85rem;
     transition: border 250ms
