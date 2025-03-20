@@ -1363,7 +1363,7 @@ img[src*="/flag/yugoslavia"] {
 
 @media (min-width: 1236px) {
     #wrapper {
-        max-width: 1110px
+        max-width: 1200px
     }
 }
 
@@ -1878,8 +1878,8 @@ body>.ui-widget-content .ui-state-hover {
 #newsletter table tr:nth-child(odd),
 #upload table tr:nth-child(odd),
 .filter_torrents table tr:nth-child(odd),
-.torrent_table table tr:nth-child(odd),
-.torrent_table tr:nth-child(odd) {
+#discog_table table tr:nth-child(odd),
+#discog_table tr:nth-child(odd) {
     background-color: #272727;
     border: 1px solid #373737
 }
@@ -1917,9 +1917,35 @@ body>.ui-widget-content .ui-state-hover {
 #newsletter table tr:nth-child(even),
 #upload table tr:nth-child(even),
 .filter_torrents table tr:nth-child(even),
-.torrent_table table tr:nth-child(even),
-.torrent_table tr:nth-child(even) {
+#discog_table table tr:nth-child(even),
+#discog_table tr:nth-child(even) {
     background-color: #2B2B2B;
+    border: 1px solid #373737
+}
+
+.group_torrent:not(.discog) {
+    background-color: #2B2B2B;
+    border: 1px solid #373737
+}
+
+.group_torrent:not(.discog) td a[onclick] {
+    font-weight: bold;
+    text-shadow: 0 3px 10px #171717
+}
+
+.group_torrent:not(.discog) + tr td {
+    padding-bottom: 30px;
+    padding-top: 10px;
+    border: 1px solid #373737;
+    color: #c1c1c1;
+}
+
+.group_torrent:not(.discog) td + td {
+    text-align: center;
+}
+
+.torrent_table table tr,
+.torrent_table tr {
     border: 1px solid #373737
 }
 
@@ -1994,8 +2020,7 @@ body>.ui-widget-content .ui-state-hover {
 }
 
 #requests .linkbox+table tr td:nth-of-type(2),
-#collages .main_column table tr td:nth-of-type(2),
-.torrent_table tr td:nth-of-type(2) {
+#collages .main_column table tr td:nth-of-type(2) {
     vertical-align: middle !important
 }
 
@@ -5133,7 +5158,7 @@ script+.leftbar img {
 }
 
 .group, .discog {
-    width: 10% !important;
+    width: 15% !important;
 }
 
 div#footer {
