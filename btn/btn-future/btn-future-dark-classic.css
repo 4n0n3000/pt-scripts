@@ -1664,8 +1664,9 @@ strong+.code {
 
 #menu>ul>li>ul {
     background-color: #2F2F2F;
-    border: 2px solid #373737;
-    min-width: 180px;
+    border: 2px solid #2a2a2a;
+    min-width: 100%;
+    width: max-content;
     position: absolute;
     top: 100%;
     left: 0;
@@ -1677,7 +1678,7 @@ strong+.code {
 }
 
 #menu>ul>li>ul>li {
-    border-top: 2px solid #373737
+    border-top: 2px solid #2a2a2a
 }
 
 #menu>ul>li>ul>li:hover {
@@ -1690,7 +1691,7 @@ strong+.code {
 
 #menu>ul>li:hover {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px
+    border-radius: 0;
 }
 
 @media (max-width: 992px) {
@@ -3624,7 +3625,8 @@ script+.leftbar img {
 #section2 table td {
     border-bottom: 1px solid #2F2F2F;
     padding: 3px;
-    vertical-align: middle
+    vertical-align: middle;
+    text-wrap: nowrap;
 }
 
 #section2 table tr:last-of-type td {
@@ -5181,4 +5183,8 @@ div#footer {
 
 #quickpost {
     overflow: inherit !important;
+}
+
+.potato-menu-item:hover ul.potato-menu-group {
+    transition: none !important;
 }
