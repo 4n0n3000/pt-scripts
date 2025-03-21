@@ -1,9 +1,9 @@
 ﻿// ==UserScript==
 // @name         BTN Sonarr Integration
 // @namespace    https://openuserjs.org/users/SB100
-// @description  The BTN <-> Sonarr Integration we always wanted (Modded by BEY0NDER for BTN FDC Theme)
+// @description  The BTN <-> Sonarr Integration we always wanted (Modded by BEY0NDER for BTN FDC Theme and Custom Headers)
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
-// @downloadURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
+// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
 // @version      1.0.2-BEY0NDER
 // @author       SB100
 // @copyright    2025, SB100 (https://openuserjs.org/users/SB100)
@@ -30,7 +30,7 @@
  */
 
 // show debug logs in the browser console
-const SETTING_DEBUG = true;
+const SETTING_DEBUG = false;
 
 // how long to cache sonarr existing series for
 // default = 1000 * 60 * 10 = 10 minutes
