@@ -736,6 +736,22 @@
 
     // Apply the background with blur and overlay
     function applyBackground(imageUrl) {
+
+        const backgroundElement = document.createElement('div');
+        backgroundElement.id = 'btn-fanart-background-filter';
+        backgroundElement.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none; /* allows clicking through this element */
+            backdrop-filter: blur(${CONFIG.blurAmount}px) !important;
+        `;
+
         const css = `
             body {
                 background-image: linear-gradient(rgba(39, 39, 39, 0.8), rgba(45, 46, 46, 0.9)), url("${imageUrl}") !important;
@@ -743,8 +759,6 @@
                 background-position: center center !important;
                 background-attachment: fixed !important;
                 background-repeat: no-repeat !important;
-                backdrop-filter: blur(${CONFIG.blurAmount}px) !important;
-                -webkit-backdrop-filter: blur(${CONFIG.blurAmount}px) !important;
                 margin: 0 auto;
                 transition: background-image 0.3s ease-in-out; /* Add transition for smoother appearance */
                 will-change: background-image; /* Hint browser to optimize this property */
@@ -786,6 +800,7 @@
 
         const styleElement = document.createElement('style');
         styleElement.textContent = css;
+        document.body.insertBefore(backgroundElement, document.body.firstChild);
         document.head.appendChild(styleElement);
     }
 
