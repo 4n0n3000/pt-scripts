@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.8
+// @version      1.1.9
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -15,6 +15,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_listValues
 // @connect      webservice.fanart.tv
+// @icon         https://passthepopcorn.me/favicon.ico
 // @require      https://cdn.jsdelivr.net/gh/sizzlemctwizzle/GM_config@43fd0fe4de1166f343883511e53546e87840aeaf/gm_config.js
 // @run-at       document-start
 // ==/UserScript==

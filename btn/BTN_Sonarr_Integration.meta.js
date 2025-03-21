@@ -4,7 +4,7 @@
 // @description  The BTN <-> Sonarr Integration we always wanted (Modded by BEY0NDER for BTN FDC Theme and Custom Headers)
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
-// @version      1.0.2-BEY0NDER
+// @version      1.0.3-BEY0NDER
 // @author       SB100
 // @copyright    2025, SB100 (https://openuserjs.org/users/SB100)
 // @license      MIT
@@ -14,6 +14,7 @@
 // @grant        GM.setValue
 // @grant        GM.registerMenuCommand
 // @connect      thetvdb.com
+// @icon	     https://broadcasthe.net/favicon.ico
 
 // ==/UserScript==
 

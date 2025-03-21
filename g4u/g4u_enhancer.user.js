@@ -1,11 +1,12 @@
 ﻿// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.6
+// @version      1.0.7
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
 // @match        *://*.g4u.to/*
 // @grant        none
+// @icon         https://g4u.to/favicon.ico
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @homepageURL  https://github.com/4n0n3000/pt-scripts
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/g4u/g4u_enhancer.user.js

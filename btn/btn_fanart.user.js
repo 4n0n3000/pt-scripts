@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.11
+// @version      1.1.12
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -17,6 +17,7 @@
 // @connect      thetvdb.com
 // @require      https://cdn.jsdelivr.net/gh/sizzlemctwizzle/GM_config@43fd0fe4de1166f343883511e53546e87840aeaf/gm_config.js
 // @run-at       document-start
+// @icon	     https://broadcasthe.net/favicon.ico
 // ==/UserScript==
 
 (function() {

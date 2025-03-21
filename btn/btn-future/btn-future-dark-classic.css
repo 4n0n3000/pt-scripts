@@ -5161,6 +5161,7 @@ script+.leftbar img {
 
 .group, .discog {
     width: 15% !important;
+    background-color: #272727 !important;
 }
 
 div#footer {
@@ -5192,3 +5193,28 @@ div#footer {
 [id^="torrent_"] > td:nth-child(1) > div:nth-child(2) > table:nth-child(1) {
     background-color: #262626;
 }
+
+/* SUPPORT FOR BTN_SORT_TORRENTS */
+
+.group_torrent.discog[details*="quality"] {
+    background-color: #2b2b2b !important;
+}
+
+tr td[colspan="5"][style*="text-align: center"][style*="color: #ffb94f"] {
+    background-color: #272727 !important;
+}
+
+/*!* 2160p (4K) torrents *!*/
+/*tr.group_torrent.discog[details*='"quality":"2160p"'] {*/
+/*    background-color: #31493f !important;*/
+/*}*/
+
+/*!* 1080p torrents *!*/
+/*tr.group_torrent.discog[details*='"quality":"1080p"'] {*/
+/*    background-color: #252525;*/
+/*}*/
+
+/*!* 720p torrents *!*/
+/*tr.group_torrent.discog[details*='"quality":"720p"'] {*/
+/*    background-color: #202020;*/
+/*}*/

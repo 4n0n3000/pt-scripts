@@ -13,7 +13,7 @@
 // @grant        GM.getValue
 // @grant        GM.setValue
 // @grant        GM.registerMenuCommand
-
+// @icon         https://passthepopcorn.me/favicon.ico
 // ==/UserScript==
 
 // ==OpenUserJS==
