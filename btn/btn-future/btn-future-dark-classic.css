@@ -1796,7 +1796,7 @@ body>.ui-widget-content .ui-state-hover {
 }
 
 .linkbox {
-    text-align: center;
+    text-align: center !important;
     margin: 15px auto
 }
 
