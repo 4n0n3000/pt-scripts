@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         BTN Fanart Background & Logo
-// @version      1.1.12
+// @version      1.1.13
 // @description  Replaces BTN background and logo with Fanart artwork and applies blur + dark overlay for series pages
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -1119,6 +1119,12 @@
 
                         // Cache the successful logo URL for faster loading on revisits
                         setCachedData(`${cacheKeyBase}_logoUrl`, logoUrl);
+
+                        // Set #logo a::after to display: none
+                        const style = document.createElement('style');
+                        style.textContent = '#logo a::after { display: none; }';
+                        document.head.appendChild(style);
+
                         console.log('BTN Fanart: Logo replaced successfully');
                     })
                     .catch(error => {
