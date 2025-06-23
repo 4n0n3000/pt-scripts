@@ -15,8 +15,10 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_listValues
 // @connect      webservice.fanart.tv
+// @connect      assets.fanart.tv
 // @icon         https://passthepopcorn.me/favicon.ico
 // @require      https://cdn.jsdelivr.net/gh/sizzlemctwizzle/GM_config@43fd0fe4de1166f343883511e53546e87840aeaf/gm_config.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js
 // @run-at       document-start
 // ==/UserScript==
 
@@ -127,27 +129,27 @@
                     saveButton.classList.add('success');
                     setTimeout(() => saveButton.classList.remove('success'), 500);
                 });
-                
+
                 // Group checkboxes with visual styling
                 const checkboxSections = [
-                    'replaceSiteLogo', 
-                    'hideUntilLoaded', 
+                    'replaceSiteLogo',
+                    'hideUntilLoaded',
                     'enableDebug'
                 ];
-                
+
                 checkboxSections.forEach(field => {
                     const checkboxVar = doc.getElementById(`PTP_Fanart_Config_${field}_var`);
                     if (checkboxVar) {
                         checkboxVar.classList.add('checkbox-section');
                     }
                 });
-                
+
                 // Group slider controls with visual styling
                 const sliderSections = [
                     'blurAmount',
                     'darkOverlayOpacity'
                 ];
-                
+
                 sliderSections.forEach(field => {
                     const sliderVar = doc.getElementById(`PTP_Fanart_Config_${field}_var`);
                     if (sliderVar) {
@@ -166,7 +168,7 @@
                 console.log('PTP Fanart: Cleared cache data after settings change');
             },
             "reset": function () {
-                // Handle reset functionality 
+                // Handle reset functionality
                 if (typeof resetToDefaults === 'function') {
                     resetToDefaults();
                 }
@@ -185,39 +187,39 @@
         },
         'css': `
             #PTP_Fanart_Config {
-                background: #191d2a; 
-                margin: 0; 
+                background: #191d2a;
+                margin: 0;
                 padding: 10px 20px;
                 color: #fff;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             }
             #PTP_Fanart_Config .config_header {
-                color: #fff; 
-                padding-bottom: 10px; 
-                font-weight: 100; 
-                justify-content: center; 
-                align-items: center; 
+                color: #fff;
+                padding-bottom: 10px;
+                font-weight: 100;
+                justify-content: center;
+                align-items: center;
                 text-align: center;
                 border-bottom: none;
                 background: transparent;
                 margin: 0;
             }
             #PTP_Fanart_Config .config_var {
-                display: flex; 
-                flex-direction: row; 
-                text-align: left; 
-                justify-content: space-between; 
-                align-items: center; 
-                width: 90%; 
-                margin-left: 26px; 
-                padding: 4px 0; 
-                border-bottom: 1px solid #7470703d; 
-                margin-top: 5px; 
+                display: flex;
+                flex-direction: row;
+                text-align: left;
+                justify-content: space-between;
+                align-items: center;
+                width: 90%;
+                margin-left: 26px;
+                padding: 4px 0;
+                border-bottom: 1px solid #7470703d;
+                margin-top: 5px;
                 margin-bottom: 5px;
             }
             #PTP_Fanart_Config .field_label {
-                color: #fff; 
-                width: 45%; 
+                color: #fff;
+                width: 45%;
                 user-select: none;
                 font-weight: 500;
             }
@@ -250,30 +252,30 @@
                 height: 16px;
             }
             #PTP_Fanart_Config .reset {
-                color: #95a5a6; 
-                text-decoration: none; 
+                color: #95a5a6;
+                text-decoration: none;
                 user-select: none;
             }
             #PTP_Fanart_Config_buttons_holder {
-                display: grid; 
-                column-gap: 20px; 
-                row-gap: 16px; 
-                grid-template-columns: 1fr 1fr 1fr; 
-                grid-template-rows: 1fr 1fr 1fr; 
-                width: 90%; 
-                margin-left: 26px; 
-                height: 94px; 
-                text-align: center; 
+                display: grid;
+                column-gap: 20px;
+                row-gap: 16px;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr 1fr 1fr;
+                width: 90%;
+                margin-left: 26px;
+                height: 94px;
+                text-align: center;
                 align-items: center;
                 margin-top: 20px;
             }
             #PTP_Fanart_Config .reset_holder {
-                grid-column: 3; 
+                grid-column: 3;
                 grid-row: 2;
             }
             #PTP_Fanart_Config .version_label {
-                grid-column: 1; 
-                grid-row: 2; 
+                grid-column: 1;
+                grid-row: 2;
                 text-align: left !important;
             }
             #PTP_Fanart_Config_resetLink {
@@ -281,7 +283,7 @@
                 background: transparent;
                 color: #95a5a6;
             }
-            #PTP_Fanart_Config .version_label:hover, 
+            #PTP_Fanart_Config .version_label:hover,
             #PTP_Fanart_Config_resetLink:hover {
                 text-decoration: underline;
             }
@@ -404,54 +406,54 @@
             background-color: #2f354669;
             backdrop-filter: brightness(0.8);
         }
-        
+
         .group_torrent.PTP-ResHeader, .forum-post__heading, .forum-post__movie-vote, .panel__heading {
             background-color: rgba(7, 11, 22, 0.60) !important;
             backdrop-filter: brightness(1);
         }
-        
+
         .group_torrent {
             background-color: #2f354669 !important;
             backdrop-filter: brightness(0.8);
         }
-        
+
         .panel {
             background-color: #2f354669 !important;
             backdrop-filter: brightness(0.8);
         }
-        
+
         .search-bar__search-field__input {
             background-color: #0b0e1ae0;
             backdrop-filter: brightness(1);
         }
-        
+
         .table > tbody > tr, .table > thead > tr {
             background-color: #2f354669 !important;
             backdrop-filter: brightness(0.8);
         }
-        
+
         .movie-page__torrent__panel {
             background-color: #181c2799;
             backdrop-filter: brightness(0.8);
         }
 
-        
+
         #PTP-Groupies-Menu {
             margin: 1em 0 1em 0 !important;
         }
-        
+
         .page__main-content {
             backdrop-filter: blur(5px);
         }
-        
+
         .table--striped > tbody > tr:nth-child(2n+1) > td, .table--striped > tbody > tr:nth-child(2n+1) > th, .table > tbody > tr.movie-page__torrent--highlighted {
             background-color: #2f354700;
         }
-        
+
         .mediainfo--in-release-description .mediainfo__section > tbody > tr, .mediainfo--in-release-description > tbody > tr {
             background-color: #242a3c00 !important;
         }
-        
+
         blockquote {
             background-color: #181c277a;
         }
@@ -583,14 +585,14 @@
                     }, { once: true });
                 }
             };
-            
+
             addStyle();
 
             // Add spinner element to the body when it's available
             const addSpinner = () => {
                 const spinner = document.createElement('div');
                 spinner.id = 'ptp-fanart-spinner';
-                
+
                 if (document.body) {
                     document.body.appendChild(spinner);
                 } else {
@@ -600,7 +602,7 @@
                     }, { once: true });
                 }
             };
-            
+
             addSpinner();
         }
     }
@@ -632,7 +634,25 @@
             timestamp: Date.now(),
             data: data
         };
-        GM_setValue(key, JSON.stringify(cacheData));
+        const jsonString = JSON.stringify(cacheData);
+
+        // Log the actual storage sizes for debugging
+        if (CONFIG.enableDebug) {
+            const originalDataSize = typeof data === 'string' ? data.length : JSON.stringify(data).length;
+            const finalStorageSize = jsonString.length;
+            log(`Storage sizes for ${key}:`);
+            log(`  Original data: ${Math.round(originalDataSize/1024)}KB`);
+            log(`  Final storage: ${Math.round(finalStorageSize/1024)}KB`);
+            log(`  Data type: ${typeof data}`);
+            log(`  Is compressed: ${typeof data === 'string' && (data.startsWith('lz:') || data.startsWith('lzc:')) ? 'YES' : 'NO'}`);
+            if (typeof data === 'string' && data.startsWith('lzc:')) {
+                log(`  Compressed data length: ${data.substring(4).length}`);
+            } else if (typeof data === 'string' && data.startsWith('lz:')) {
+                log(`  Compressed data length: ${data.substring(3).length}`);
+            }
+        }
+
+        GM_setValue(key, jsonString);
     }
 
     // Get IMDb ID from the page
@@ -648,17 +668,17 @@
     function fetchArtwork(imdbId) {
         const cacheKey = `fanart_${imdbId}`;
         const cachedData = getCachedData(cacheKey);
-        
+
         if (cachedData) {
             log('Using cached artwork data for', imdbId);
             return Promise.resolve(cachedData);
         }
-        
+
         log('Fetching artwork data for', imdbId);
-        
+
         return new Promise((resolve, reject) => {
             const url = `https://webservice.fanart.tv/v3/movies/${imdbId}?api_key=${FANART_API_KEY}`;
-            
+
             GM_xmlhttpRequest({
                 method: 'GET',
                 url: url,
@@ -688,7 +708,7 @@
             });
         });
     }
-    
+
     // Get the best background image from Fanart.tv data
     function getBestBackground(data) {
         const backgroundImages = [];
@@ -878,30 +898,13 @@
                 }
             }, 1500); // Extended to match the longer transition time
         }
-        
+
         // Apply theme CSS
         if (CONFIG.theme === 'Audionut') {
             GM_addStyle(audionutCSS);
         } else {
             GM_addStyle(defaultCSS);
         }
-    }
-
-    // Preload an image and return a promise
-    function preloadImage(url) {
-        // Add a preload link to hint the browser to prioritize this resource
-        const preloadLink = document.createElement('link');
-        preloadLink.rel = 'preload';
-        preloadLink.as = 'image';
-        preloadLink.href = url;
-        document.head.appendChild(preloadLink);
-        
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => resolve(url);
-            img.onerror = () => reject(`Failed to load image: ${url}`);
-            img.src = url;
-        });
     }
 
     // Replace the site logo with movie logo from fanart.tv
@@ -970,111 +973,224 @@
         console.log(`PTP Fanart: Adjusted logo margin-top to ${marginTop}rem (user-info-bar height: ${userInfoBarHeight}px)`);
     }
 
+    function compressBase64(base64String) {
+        try {
+            // Remove data URL prefix if present
+            const base64Data = base64String.replace(/^data:image\/[a-z]+;base64,/, '');
+
+            log(`Attempting compression on ${Math.round(base64Data.length/1024)}KB of base64 data`);
+
+            // Use LZ-string compression - try regular compress first (it works better for base64)
+            if (typeof LZString !== 'undefined') {
+                const compressed = LZString.compress(base64Data);
+
+                // Only use compressed version if it's actually smaller
+                if (compressed && compressed.length < base64Data.length) {
+                    const originalSize = base64Data.length;
+                    const compressedSize = compressed.length;
+                    const reduction = Math.round((1 - compressedSize/originalSize) * 100);
+
+                    log(`✓ LZ-string compression successful: ${Math.round(originalSize/1024)}KB -> ${Math.round(compressedSize/1024)}KB (${reduction}% reduction)`);
+                    return `lzc:${compressed}`;
+                } else {
+                    log(`✗ LZ-string compression not beneficial, trying compressToBase64`);
+
+                    // Fallback to compressToBase64 if regular compress doesn't work
+                    const compressedBase64 = LZString.compressToBase64(base64Data);
+                    if (compressedBase64 && compressedBase64.length < base64Data.length) {
+                        const reduction = Math.round((1 - compressedBase64.length/base64Data.length) * 100);
+                        log(`✓ Alternative compression successful: ${Math.round(base64Data.length/1024)}KB -> ${Math.round(compressedBase64.length/1024)}KB (${reduction}% reduction)`);
+                        return `lz:${compressedBase64}`;
+                    }
+
+                    log('All compression methods failed, using original');
+                    return base64String;
+                }
+            } else {
+                log('LZ-string not available, using original');
+                return base64String;
+            }
+
+        } catch (error) {
+            console.warn('PTP Fanart: Compression failed, using original', error);
+            return base64String;
+        }
+    }
+
+    function decompressBase64(compressedData) {
+        try {
+            // Check if data is LZ-string compressed
+            if (typeof compressedData === 'string') {
+                if (compressedData.startsWith('lz:')) {
+                    if (typeof LZString !== 'undefined') {
+                        const compressedBase64 = compressedData.substring(3);
+                        const decompressed = LZString.decompressFromBase64(compressedBase64);
+
+                        if (decompressed) {
+                            return `data:image/jpeg;base64,${decompressed}`;
+                        } else {
+                            console.warn('PTP Fanart: LZ-string decompression failed');
+                            return compressedData;
+                        }
+                    }
+                } else if (compressedData.startsWith('lzc:')) {
+                    if (typeof LZString !== 'undefined') {
+                        const compressed = compressedData.substring(4);
+                        const decompressed = LZString.decompress(compressed);
+
+                        if (decompressed) {
+                            return `data:image/jpeg;base64,${decompressed}`;
+                        } else {
+                            console.warn('PTP Fanart: Alternative LZ decompression failed');
+                            return compressedData;
+                        }
+                    }
+                }
+            }
+
+            // Return as-is if not compressed
+            return compressedData;
+
+        } catch (error) {
+            console.warn('PTP Fanart: Decompression failed, using original', error);
+            return compressedData;
+        }
+    }
+
+    // Enhanced preloadImage function with base64 caching (first image only)
+    function preloadImageAndCache(url, cacheKey, shouldCache = false) {
+        // Check if we have a cached base64 version
+        if (shouldCache) {
+            const cachedBase64 = getCachedData(`${cacheKey}_base64`);
+            if (cachedBase64) {
+                log('Using cached base64 image for', cacheKey);
+                return Promise.resolve(decompressBase64(cachedBase64));
+            }
+        }
+
+        log('Fetching image', shouldCache ? 'and caching as base64' : '', 'for', cacheKey);
+
+        return new Promise((resolve, reject) => {
+            if (shouldCache) {
+                // Use GM_xmlhttpRequest for cross-origin image requests
+                GM_xmlhttpRequest({
+                    method: 'GET',
+                    url: url,
+                    responseType: 'blob',
+                    onload: function(response) {
+                        if (response.status === 200) {
+                            // Convert blob to base64
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                const base64 = reader.result;
+                                const compressed = compressBase64(base64);
+                                setCachedData(`${cacheKey}_base64`, compressed);
+                                log(`Cached base64 image (${Math.round(base64.length / 1024)}KB) for`, cacheKey);
+                                resolve(base64);
+                            };
+                            reader.onerror = reject;
+                            reader.readAsDataURL(response.response);
+                        } else {
+                            reject(new Error(`HTTP ${response.status}`));
+                        }
+                    },
+                    onerror: function(error) {
+                        reject(error);
+                    }
+                });
+            } else {
+                // Just preload without caching using regular image loading
+                const img = new Image();
+                img.onload = () => resolve(url);
+                img.onerror = () => reject(`Failed to load image: ${url}`);
+                img.crossOrigin = 'anonymous'; // Add this for cross-origin images
+                img.src = url;
+            }
+        });
+    }
+
     // Main execution
     async function init() {
         console.log('PING');
         try {
-            // Try to get the current URL to use as a cache key base
             const pageUrl = window.location.href;
             const cacheKeyBase = pageUrl.split('?')[0] + (pageUrl.match(/id=(\d+)/) ? pageUrl.match(/id=(\d+)/)[1] : '');
 
-            // First check if we have a cached background URL - if so, apply it immediately 
-            // while we fetch the rest of the data to provide instant visual feedback
-            const cachedBackgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
-            if (cachedBackgroundUrl) {
-                log('Found cached background URL, applying immediately');
-                applyBackground(cachedBackgroundUrl);
+            // Check for cached base64 background first
+            const cachedBackgroundBase64 = getCachedData(`${cacheKeyBase}_background_base64`);
+            if (cachedBackgroundBase64) {
+                log('Found cached base64 background, applying immediately');
+                applyBackground(decompressBase64(cachedBackgroundBase64));
             }
 
-            // First, check if we have cached TVDB ID
+            // Get IMDB ID and artwork data (existing logic)
             let imdbId = getCachedData(`${cacheKeyBase}_imdbId`);
-
             if (!imdbId) {
-                // If not cached, fetch the TVDB ID
                 imdbId = await getImdbId();
                 if (imdbId) {
-                    // Cache the TVDB ID for future use
                     setCachedData(`${cacheKeyBase}_imdbId`, imdbId);
                 }
             }
 
-            // Check for cached artwork data
             let artworkData = getCachedData(`${cacheKeyBase}_artwork`);
-
             if (!artworkData && imdbId) {
-                // If not cached, fetch the artwork data
                 artworkData = await fetchArtwork(imdbId);
                 if (artworkData) {
-                    // Cache the artwork data for future use
                     setCachedData(`${cacheKeyBase}_artwork`, artworkData);
                 }
             }
 
-            // Get background and logo URLs from fanart.tv
+            // Get URLs from artwork data
             let backgroundUrls = artworkData ? getBestBackground(artworkData) : null;
             const logoUrl = artworkData && CONFIG.replaceSiteLogo ? getBestLogo(artworkData) : null;
 
-            // Select a random background from the available options
-            let backgroundUrl = null;
-            if (backgroundUrls && backgroundUrls.length > 0) {
-                // Pick a random background from the available ones
-                backgroundUrl = backgroundUrls[Math.floor(Math.random() * backgroundUrls.length)];
-                
-                // Store last used background URL in cache
-                if (backgroundUrl) {
-                    setCachedData(`${cacheKeyBase}_lastBackgroundUrl`, backgroundUrl);
-                }
-            } else if (!cachedBackgroundUrl) {
-                // Fallback to cached background only if we don't have one already applied
-                backgroundUrl = getCachedData(`${cacheKeyBase}_lastBackgroundUrl`);
-            }
-
-            // Array to hold preload promises
             const preloadPromises = [];
-
-            // Track if logo was successfully applied
             let logoApplied = false;
-            
-            // Apply background if we have a new URL and haven't already applied a cached one,
-            // or if the new URL is different from the cached one we already applied
-            if (backgroundUrl && (!cachedBackgroundUrl || backgroundUrl !== cachedBackgroundUrl)) {
+
+            // Handle background (cache ONLY the first/primary background)
+            if (backgroundUrls && backgroundUrls.length > 0 && !cachedBackgroundBase64) {
+                const primaryBackgroundUrl = backgroundUrls[0]; // Use first image only
                 preloadPromises.push(
-                    preloadImage(backgroundUrl)
-                    .then(() => {
-                        applyBackground(backgroundUrl);
-                        console.log('PTP Fanart: Background applied successfully');
+                    preloadImageAndCache(primaryBackgroundUrl, `${cacheKeyBase}_background`, true)
+                    .then(base64Url => {
+                        applyBackground(base64Url);
+                        console.log('PTP Fanart: Background applied and cached as base64');
                     })
                     .catch(error => {
-                        console.error('PTP Fanart: Failed to preload background', error);
-                    })
-                );
-            }
-            // Preload logo image if available
-            if (logoUrl) {
-                preloadPromises.push(
-                    preloadImage(logoUrl)
-                    .then(() => {
-                        logoApplied = replaceSiteLogo(logoUrl);
-                    })
-                    .catch(error => {
-                        console.error('PTP Fanart: Failed to preload logo', error);
+                        console.error('PTP Fanart: Failed to preload/cache background', error);
                     })
                 );
             }
 
-            // If we're showing content after images load, wait for preloads to complete
+            // Handle logo (cache the logo as base64)
+            if (logoUrl) {
+                const cachedLogoBase64 = getCachedData(`${cacheKeyBase}_logo_base64`);
+                if (cachedLogoBase64) {
+                    log('Using cached base64 logo');
+                    logoApplied = replaceSiteLogo(decompressBase64(cachedLogoBase64));
+                } else {
+                    preloadPromises.push(
+                        preloadImageAndCache(logoUrl, `${cacheKeyBase}_logo`, true)
+                        .then(base64Url => {
+                            logoApplied = replaceSiteLogo(base64Url);
+                            console.log('PTP Fanart: Logo applied and cached as base64');
+                        })
+                        .catch(error => {
+                            console.error('PTP Fanart: Failed to preload/cache logo', error);
+                        })
+                    );
+                }
+            }
+
+            // Show content logic (existing)
             if (CONFIG.hideUntilLoaded && preloadPromises.length > 0) {
                 await Promise.allSettled(preloadPromises);
-                // Show content once everything is done
                 showContent(logoApplied);
             } else {
-                // Otherwise show content immediately and let images load in background
-                // Wait a small amount of time to ensure basic styling is applied
                 setTimeout(() => {
                     showContent(logoApplied);
                 }, 100);
-                
-                // Still track completion in background
+
                 Promise.allSettled(preloadPromises).then(() => {
                     log('All image preloads complete or failed');
                 });
@@ -1082,7 +1198,7 @@
 
         } catch (error) {
             console.error('PTP Fanart: Error in init', error);
-            showContent(); // Show content even if there's an error
+            showContent();
         }
     }
 
@@ -1096,7 +1212,7 @@
             init();
             return;
         }
-        
+
         // Set up mutation observer to watch for these elements
         const observer = new MutationObserver((mutations, obs) => {
             const imdbLink = document.querySelector('#imdb-title-link');
@@ -1106,7 +1222,7 @@
                 init();
             }
         });
-        
+
         // Start observing as soon as body is available
         if (document.body) {
             observer.observe(document.body, { childList: true, subtree: true });
@@ -1116,7 +1232,7 @@
                 observer.observe(document.body, { childList: true, subtree: true });
             }, { once: true });
         }
-        
+
         // Fallback: Start after a timeout even if elements aren't found
         setTimeout(() => {
             observer.disconnect();
@@ -1126,7 +1242,7 @@
             }
         }, 5000);
     }
-    
+
     // Start immediately
     waitForImdb();
 })();
