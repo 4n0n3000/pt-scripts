@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.9
+// @version      1.1.10
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -831,13 +831,6 @@
     function showContent() {
         if (CONFIG.hideUntilLoaded) {
 
-            // Apply theme CSS
-            if (CONFIG.theme === 'Audionut') {
-                GM_addStyle(audionutCSS);
-            } else {
-                GM_addStyle(defaultCSS);
-            }
-
             // Fade out overlay and spinner
             const initialStyles = document.getElementById('ptp-fanart-initial-styles');
             if (initialStyles) {
@@ -884,6 +877,13 @@
                     spinner.parentNode.removeChild(spinner);
                 }
             }, 1500); // Extended to match the longer transition time
+        }
+        
+        // Apply theme CSS
+        if (CONFIG.theme === 'Audionut') {
+            GM_addStyle(audionutCSS);
+        } else {
+            GM_addStyle(defaultCSS);
         }
     }
 
