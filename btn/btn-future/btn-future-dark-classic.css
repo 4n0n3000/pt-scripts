@@ -4853,7 +4853,7 @@ script+.leftbar img {
     flex-direction: column;
     flex-wrap: nowrap;
     justify-content: space-between;
-    width: calc(100% / 7) !important
+    width: calc(97% / 7) !important
 }
 
 #bonus #content>.thin:has(>.thin) table td br,
@@ -4888,7 +4888,7 @@ script+.leftbar img {
     bottom: 10px;
     right: 10px;
     background-image: url("https://starblaster100.github.io/btn-future/static/icons/confetti-ball.png");
-    background-size: cover;
+    background-size: contain;
     opacity: 0.1
 }
 
