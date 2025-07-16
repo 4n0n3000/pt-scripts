@@ -1,6 +1,6 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.7
+// @version      1.0.8
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -47,7 +47,7 @@
 
         nonUsenet.forEach(host => {
             document.querySelectorAll(`img[alt="${host}"]`).forEach(img => {
-                const tableRow = img.closest('tr');
+                const tableRow = img.closest('div');
                 if (tableRow) {
                     if (isUsenetModeEnabled) {
                         // Hide the row when Usenet mode is enabled
@@ -202,6 +202,32 @@
             }
         });
 
+        // Remove Free Highspeed Download
+        document.querySelectorAll('a').forEach(a => {
+            if (a.textContent.includes('⚡ Free Highspeed Download')) {
+                // Find the parent element and remove it
+                const parent = a.closest('div');
+                if (parent) {
+                    parent.remove();
+                } else {
+                    a.remove();
+                }
+            }
+        });
+
+        // Remove the "Would you like to support us?" paragraph
+        document.querySelectorAll('p').forEach(p => {
+            if (p.textContent.includes('Wanna support us?')) {
+                // Find the parent element and remove it
+                const parent = p.closest('.w3-panel.w3-black.w3-center.w3-small');
+                if (parent) {
+                    parent.remove();
+                } else {
+                    p.remove();
+                }
+            }
+        });
+
     }
 
     // Function to make the Notes section collapsible - run this only once
@@ -326,7 +352,7 @@
             background-color: #1e1e1e;
             color: #e0e0e0;
         }
-        
+
         body.dark-mode .usenet-mode-toggle {
             #e0e0e0;
         }
@@ -359,7 +385,7 @@
         body.dark-mode .w3-striped tbody tr:nth-child(even) {
             background-color: #333;
         }
-        
+
         body.dark-mode .w3-striped tbody tr:nth-child(even) {
             background-color: #333;
         }
