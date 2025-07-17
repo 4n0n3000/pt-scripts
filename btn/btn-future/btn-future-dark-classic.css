@@ -294,7 +294,6 @@ body pre {
 body {
     text-align: left;
     line-height: 1.0rem;
-    word-wrap: anywhere;
     background: #1D1D1D url("https://ptpimg.me/z74g9y.png") top center fixed;
     background-size: cover;
     margin: 0 auto
