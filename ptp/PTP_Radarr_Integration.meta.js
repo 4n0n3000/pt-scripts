@@ -4,7 +4,7 @@
 // @description  The PTP <-> Radarr Integration we always wanted (Modded by BEY0NDER Custom Headers)
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/PTP_Radarr_Integration.meta.js
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ptp/PTP_Radarr_Integration.meta.js
-// @version      1.6.4-BEY0NDER
+// @version      1.6.5-BEY0NDER
 // @author       SB100
 // @copyright    2022, SB100 (https://openuserjs.org/users/SB100)
 // @license      MIT
@@ -169,20 +169,23 @@ async function query(path, method = 'get', params = {}) {
 
     const headerName = await getConfig('headerName', '');
     const headerValue = await getConfig('headerValue', '');
+    const headerName2 = await getConfig('headerName2', '');
+    const headerValue2 = await getConfig('headerValue2', '');
 
     const customHeaders = {};
     if (headerName && headerValue) {
         customHeaders[headerName] = headerValue;
+    }
+    if (headerName2 && headerValue2) {
+        customHeaders[headerName2] = headerValue2;
     }
 
     const url = new URL(`${radarrUrl}/api/v3${path}`);
     const obj = {
         method,
         timeout: 60000,
-        onloadstart: () => {},
         onload: (response) => resolver(response),
         onerror: (response) => rejecter(response),
-        ontimeout: (response) => rejecter(response),
     };
 
     if (method === 'post') {
@@ -1175,7 +1178,8 @@ async function createRadarrConfig() {
 
     const headerName = await getConfig('headerName', '');
     const headerValue = await getConfig('headerValue', '');
-
+    const headerName2 = await getConfig('headerName2', '');
+    const headerValue2 = await getConfig('headerValue2', '');
     const {
         body
     } = document;
@@ -1208,10 +1212,14 @@ async function createRadarrConfig() {
   </label>
 
   <label for="ptp-radarr__config-header-name" class="ptp-radarr__config-label">
-    Custom Header:
+    Custom Headers:
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;width: 300px;">
       <input type="text" class="ptp-radarr__config-input" id="ptp-radarr__config-header-name" data-config-key="headerName" placeholder="Header Name" value="${headerName || ''}" style="width: 40%; margin-right: 10px;" />
       <input type="text" class="ptp-radarr__config-input" id="ptp-radarr__config-header-value" data-config-key="headerValue" placeholder="Header Value" value="${headerValue || ''}" style="width: max-content;" />
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;width: 300px;">
+      <input type="text" class="ptp-radarr__config-input" id="ptp-radarr__config-header-name2" data-config-key="headerName2" placeholder="Header Name" value="${headerName2 || ''}" style="width: 40%; margin-right: 10px;" />
+      <input type="text" class="ptp-radarr__config-input" id="ptp-radarr__config-header-value2" data-config-key="headerValue2" placeholder="Header Value" value="${headerValue2 || ''}" style="width: max-content;" />
     </div>
   </label>
 

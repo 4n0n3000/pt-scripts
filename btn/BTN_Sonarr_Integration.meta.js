@@ -4,7 +4,7 @@
 // @description  The BTN <-> Sonarr Integration we always wanted (Modded by BEY0NDER for BTN FDC Theme and Custom Headers)
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/btn/BTN_Sonarr_Integration.meta.js
-// @version      1.0.3-BEY0NDER
+// @version      1.0.4-BEY0NDER
 // @author       SB100
 // @copyright    2025, SB100 (https://openuserjs.org/users/SB100)
 // @license      MIT
@@ -138,10 +138,8 @@ async function query(url, method = 'get', params = {}, sonarrApiKey = null, cust
     const obj = {
         method,
         timeout: 60000,
-        onloadstart: () => {},
         onload: (response) => resolver(response),
         onerror: (response) => rejecter(response),
-        ontimeout: (response) => rejecter(response),
     };
 
     if (method === 'post') {
@@ -197,10 +195,15 @@ async function sonarrGet(path, params = {}) {
     const url = `${sonarrUrl}/api/v3`;
     const headerName = await getConfig('headerName', '');
     const headerValue = await getConfig('headerValue', '');
+    const headerName2 = await getConfig('headerName2', '');
+    const headerValue2 = await getConfig('headerValue2', '');
 
     const customHeaders = {};
     if (headerName && headerValue) {
         customHeaders[headerName] = headerValue;
+    }
+    if (headerName2 && headerValue2) {
+        customHeaders[headerName2] = headerValue2;
     }
 
 
@@ -1051,6 +1054,8 @@ async function createSonarrConfig() {
 
     const headerName = await getConfig('headerName', '');
     const headerValue = await getConfig('headerValue', '');
+    const headerName2 = await getConfig('headerName', '');
+    const headerValue2 = await getConfig('headerValue', '');
 
     const {
         body
@@ -1082,10 +1087,14 @@ async function createSonarrConfig() {
   </label>
   
   <label for="btn-sonarr__config-header-name" class="btn-sonarr__config-label">
-    Custom Header:
+    Custom Headers:
     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;width: 340px;">
       <input type="text" class="btn-sonarr__config-input" id="btn-sonarr__config-header-name" data-config-key="headerName" placeholder="Header Name" value="${headerName || ''}" style="width: 40%; margin-right: 10px;" />
       <input type="text" class="btn-sonarr__config-input" id="btn-sonarr__config-header-value" data-config-key="headerValue" placeholder="Header Value" value="${headerValue || ''}" style="width: 60%;" />
+    </div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;width: 340px;">
+      <input type="text" class="btn-sonarr__config-input" id="btn-sonarr__config-header-name2" data-config-key="headerName2" placeholder="Header Name" value="${headerName2 || ''}" style="width: 40%; margin-right: 10px;" />
+      <input type="text" class="btn-sonarr__config-input" id="btn-sonarr__config-header-value2" data-config-key="headerValue2" placeholder="Header Value" value="${headerValue2 || ''}" style="width: 60%;" />
     </div>
   </label>
 
