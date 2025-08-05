@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         G4U Enhancer
-// @version      1.0.8
+// @version      1.0.9
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -205,6 +205,19 @@
         // Remove Free Highspeed Download
         document.querySelectorAll('a').forEach(a => {
             if (a.textContent.includes('⚡ Free Highspeed Download')) {
+                // Find the parent element and remove it
+                const parent = a.closest('div');
+                if (parent) {
+                    parent.remove();
+                } else {
+                    a.remove();
+                }
+            }
+        });
+
+        // Remove Highspeed Download
+        document.querySelectorAll('a').forEach(a => {
+            if (a.textContent.includes('⚡ Highspeed Download')) {
                 // Find the parent element and remove it
                 const parent = a.closest('div');
                 if (parent) {
