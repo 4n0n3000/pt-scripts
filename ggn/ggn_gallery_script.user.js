@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name         GGn Torrent Gallery
 // @namespace    https://github.com/4n0n3000/pt-scripts
-// @version      1.0.0
-// @description GGn Torrent Gallery Script
+// @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
+// @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
+// @version      1.1.0
+// @description  GGn Torrent Gallery Script
 // @include      https://gazellegames.net/torrents.php*
 // @exclude      https://gazellegames.net/torrents.php?id*
 // @grant        GM_xmlhttpRequest
@@ -18,8 +20,7 @@
 // ==/UserScript==
 // Thanks RobotFish for the barebones script
 
-function Torrent(link, name, platform, year, ageRating, userRating, checked, sticky){
-	//console.log(this)
+function Torrent(link, name, platform, year, ageRating, userRating, checked, sticky, when, size){
 	this.link = link;
 	this.name = name;
 	this.img = "";
@@ -29,6 +30,8 @@ function Torrent(link, name, platform, year, ageRating, userRating, checked, sti
 	this.userRating = userRating;
 	this.checked = checked;
 	this.sticky = sticky;
+    this.when = when;
+    this.size = size;
 }
 let groups = [];
 let showGallery = localStorage.getItem("galleryView") == "false" ? false : true;
@@ -80,16 +83,16 @@ function initConfig(){
                 </div>
             `,
             fields: {
+                enableFooter: { label: 'Enable Footer Details', type: 'checkbox', default: true, title: 'Toggle footer details for more group info' },
+                widthConfig: { label: 'Card Per Row', type: 'select', options: ['5','6','7','8'], default: '5', title: 'Number of cards per row' },
                 cacheExpiryDays: { label: 'Cache Expiry (days)', type: 'int', default: 7, title: 'Number of days to cache cover image URLs' },
                 blurAmount: { label: 'Background Blur Amount (px) *', type: 'int', default: 18, title: 'Amount of blur applied to the background fill behind cover images' },
-                aspectRatio: { label: 'Card Aspect Ratio *', type: 'select', options: ['16/9','4/3','1/1','3/2','2/3','3/4','21/9'], default: '3/4', title: 'Aspect ratio of the media area (e.g., 16/9). Use auto to size by content' },
-                enableDebug: { label: 'Enable Debug Mode', type: 'checkbox', default: false, title: 'Enable console logging for debugging' }
             },
             events: {
                 open: function(doc){
                     let style = this.frame.style;
                     style.width = '420px';
-                    style.height = '520px';
+                    style.height = '410px';
                     style.inset = '';
                     style.top = '4%';
                     style.right = '6%';
@@ -115,7 +118,7 @@ function initConfig(){
                         });
                     }
 
-                    const checkboxSections = [ 'enableDebug' ];
+                    const checkboxSections = [ 'enableFooter' ];
                     checkboxSections.forEach(field => {
                         const el = doc.getElementById(`GGN_Gallery_Config_${field}_var`);
                         if (el) el.classList.add('checkbox-section');
@@ -153,7 +156,7 @@ function initConfig(){
                 #GGN_Gallery_Config select { background: rgba(255,255,255,0.9); border: 1px solid #ddd; border-radius: 3px; box-sizing: border-box; font-size: 0.9em; padding: 8px; width: 55%; transition: all 0.3s ease; }
                 #GGN_Gallery_Config input[type="text"]:focus,
                 #GGN_Gallery_Config input[type="number"]:focus,
-                #GGN_Gallery_Config select:focus { border-color: #2C3E50; box-shadow: 0 0 5px rgba(255,128,0,0.5); outline: none; }
+                #GGN_Gallery_Config select:focus { border-color: #2C3E50; box-shadow: 0 0 5px rgba(134, 212, 6, 0.6); outline: none; }
                 #GGN_Gallery_Config input[type="checkbox"] { cursor: pointer; margin-right: 4px !important; width: 16px; height: 16px; }
                 #GGN_Gallery_Config .reset { color: #95a5a6; text-decoration: none; user-select: none; }
                 #GGN_Gallery_Config_buttons_holder { display: grid; column-gap: 20px; row-gap: 16px; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr; width: 90%; margin-left: 26px; height: 94px; text-align: center; align-items: center; margin-top: 20px; }
@@ -165,15 +168,15 @@ function initConfig(){
                 #GGN_Gallery_Config .saveclose_buttons { margin: 22px 0px 4px; }
                 #GGN_Gallery_Config_saveBtn { grid-column: 2; grid-row: 1; background-color: #2C3E50; color: #FFFFFF; border: none; border-radius: 5px; padding: 15px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; will-change: background-color, transform; transition: background-color 0.2s ease, transform 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding-top: 6px !important; padding-bottom: 6px !important; }
                 #GGN_Gallery_Config_saveBtn:hover { background-color: #34495E; transform: translateY(-2px); }
-                #GGN_Gallery_Config_saveBtn:active { background-color: #fd9b3a; transform: translateY(1px); }
-                #GGN_Gallery_Config_saveBtn.success { box-shadow: 0 0 6px 3px rgba(253,155,58,0.6); }
+                #GGN_Gallery_Config_saveBtn:active { background-color: #86d406; transform: translateY(1px); }
+                #GGN_Gallery_Config_saveBtn.success { box-shadow: 0 0 6px 3px rgba(134, 212, 6, 0.6); }
                 #GGN_Gallery_Config_closeBtn { grid-column: 3; grid-row: 1; background-color: #2C3E50; color: #FFFFFF; border: none; border-radius: 5px; padding: 15px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; will-change: background-color, transform; transition: background-color 0.2s ease, transform 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); padding-top: 6px !important; padding-bottom: 6px !important; }
                 #GGN_Gallery_Config_closeBtn:hover { background-color: #34495E; transform: translateY(-2px); }
                 #GGN_Gallery_Config_closeBtn:active { background-color: #2C3E50; transform: translateY(1px); }
                 /* Tooltip styling */
                 #GGN_Gallery_Config .field_label[title]:hover::after { content: attr(title); position: absolute; background: #2C3E50; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.8em; max-width: 300px; z-index: 100; margin-top: 25px; left: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
                 /* Animations */
-                @keyframes pulse { 0%,100%{box-shadow:0 0 6px 2px rgba(255,128,0,0.5);} 50%{box-shadow:0 0 10px 4px rgba(255,128,0,0.8);} }
+                @keyframes pulse { 0%,100%{box-shadow:0 0 6px 2px rgba(255,128,0,0.5);} 50%{box-shadow:0 0 10px 4px #86d406;} }
             `
         });
 
@@ -192,17 +195,44 @@ function initConfig(){
 
 function applyConfigStyles(){
     try {
+        const footerDetails = (GM_config && GM_config.get) ? GM_config.get('enableFooter') : true;
+        if (footerDetails === true){
+            document.documentElement.style.setProperty('--footer-details', `block`);
+        } else {
+            document.documentElement.style.setProperty('--footer-details', `none`);
+        }
+        
         const blur = (GM_config && GM_config.get) ? GM_config.get('blurAmount') : 18;
         document.documentElement.style.setProperty('--ggn-blur', `${blur}px`);
-        const aspect = (GM_config && GM_config.get) ? GM_config.get('aspectRatio') : '3/4';
-        document.documentElement.style.setProperty('--ggn-aspect', aspect || '3/4');
-    } catch(e) {}
-}
-
-function debugLog(){
-    try {
-        if (GM_config && GM_config.get && GM_config.get('enableDebug')) {
-            console.log('[GGN Gallery]', ...arguments);
+        const rows = (GM_config && GM_config.get) ? GM_config.get('widthConfig') : '5';
+        if (rows === '5'){
+            document.documentElement.style.setProperty('--ggn-width', `220px`);
+            document.documentElement.style.setProperty('--footer-font-size', '10pt');
+            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
+            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
+            document.documentElement.style.setProperty('--platform-img-width', '28px');
+            document.documentElement.style.setProperty('--platform-img-height', '28px');
+        } else if (rows === '6'){
+            document.documentElement.style.setProperty('--ggn-width', `200px`);
+            document.documentElement.style.setProperty('--footer-font-size', '9pt');
+            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
+            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
+            document.documentElement.style.setProperty('--platform-img-width', '20px');
+            document.documentElement.style.setProperty('--platform-img-height', '20px');
+        } else if (rows === '7'){
+            document.documentElement.style.setProperty('--ggn-width', `160px`);
+            document.documentElement.style.setProperty('--footer-font-size', '8pt');
+            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
+            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
+            document.documentElement.style.setProperty('--platform-img-width', '15px');
+            document.documentElement.style.setProperty('--platform-img-height', '15px');
+        } else if (rows === '8'){
+            document.documentElement.style.setProperty('--ggn-width', `140px`);
+            document.documentElement.style.setProperty('--footer-font-size', '7pt');
+            document.documentElement.style.setProperty('--footer-font-minus', '0.5pt');
+            document.documentElement.style.setProperty('--footer-font-plus', '0.5pt');
+            document.documentElement.style.setProperty('--platform-img-width', '10px');
+            document.documentElement.style.setProperty('--platform-img-height', '10px');
         }
     } catch(e) {}
 }
@@ -225,7 +255,6 @@ function getCachedData(key){
         if (!timestamp) return null;
         if ((Date.now() - timestamp) > cacheExpiryMs()) {
             GM_setValue(key, null);
-            debugLog('Cache expired for', key);
             return null;
         }
         return data;
@@ -237,7 +266,6 @@ function getCachedData(key){
 function setCachedData(key, data){
     try {
         GM_setValue(key, JSON.stringify({ timestamp: Date.now(), data }));
-        debugLog('Cached', key);
     } catch(e){}
 }
 
@@ -286,7 +314,6 @@ var initImages = function(){
             for(let i=0;i<groups.length;i++){
                 if(groups[i].link == link){
                     applyCoverToIndex(i, cached);
-                    debugLog('Applied cached cover', link);
                     break;
                 }
             }
@@ -303,7 +330,6 @@ var initImages = function(){
                         if(groups[i].link == link){
                             if (image_src) setCachedCover(link, image_src);
                             applyCoverToIndex(i, image_src);
-                            debugLog(image_src ? 'Fetched cover' : 'No cover found', link, image_src || '');
                             break;
                         }
                     }
@@ -342,26 +368,22 @@ var initGallery = function(){
 	}
 
 	let style = document.createElement("style");
-	style.type = "text/css";
 	style.innerHTML = `
 	  :root{--ggn-card-bg:#1c3145;--ggn-card-bg2:#2b4e66;--ggn-text:#e6f1f7;--ggn-muted:#97a8b6;--ggn-overlay:rgba(0,0,0,0.35);}
 	  #gallery_view{background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));padding:8px;border-radius:6px}
 	  #gallery_info{display:flex;align-items:center;justify-content:space-between;color:var(--ggn-text)}
 	  #galleryToggle{float:right;margin-left:5px;color:var(--ggn-text);text-decoration:none;cursor:pointer}
 	  #galleryToggle:hover{text-decoration:underline}
-	  #collageBody{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;float:left;margin-top:10px;background:rgba(27,47,63,0.35);padding:8px;border-radius:6px}
+	  #collageBody{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--ggn-width, 220px), 1fr));gap:10px;float:left;margin-top:10px;background:rgba(27,47,63,0.35);padding:8px;border-radius:6px}
 	  .groupWrapper{height:auto;box-sizing:border-box;overflow:hidden;background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:scale .5s ease, box-shadow .15s ease;position:relative}
 	  .groupWrapper:hover{scale:103%;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
-	  .releaseMedia{position:static;display:flex;align-items:center;justify-content:center;aspect-ratio: var(--ggn-aspect, 3/4)}
+	  .releaseMedia{position:static;display:flex;align-items:center;justify-content:center;aspect-ratio:3/4}
 	  .coverBg{position:absolute;inset:0;background-position:center;background-repeat:no-repeat;background-size:cover;filter:blur(var(--ggn-blur, 18px)) saturate(110%) brightness(80%);transform:scale(1)}
 	  .coverBg::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,.15), rgba(0,0,0,.25))}
 	  .coverImage{display:block;position:relative;max-width:100%;max-height:100%;width:80%;height:auto;object-fit:contain;margin:auto;border-radius:5px}
 	  .releaseTitle{text-align:center;font-size:10pt;display:block;padding:10px;overflow:hidden;line-height:1.3;white-space:nowrap;text-overflow:ellipsis;color:var(--ggn-text);background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));position:relative;z-index:1}
-	  .hiddenType{color:#525252 !important;text-decoration:line-through}
-
-	  /* Badges */
-	  .groupWrapper.is-sticky::before{content:"Sticky";position:absolute;top:6px;left:6px;background:#d97706;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px}
-	  .groupWrapper.is-checked::after{content:"✓";position:absolute;top:6px;right:6px;background:#059669;color:#fff;font-weight:bold;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+	  .releaseFooter{text-align:center;font-size:10pt;display:var(--footer-details);padding:10px;overflow:hidden;line-height:1.3;white-space:nowrap;text-overflow:ellipsis;color:var(--ggn-text);background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));position:relative;z-index:1;font-weight:bold}
+      .hiddenType{color:#525252 !important;text-decoration:line-through}
 	`;
 	document.getElementsByTagName("head")[0].append(style);
 
@@ -371,16 +393,16 @@ var initGallery = function(){
 var initGroups = function(){
 	document.getElementById("collageBody").innerHTML="";
 	for(let i=0;i<groups.length;i++){
-		// console.log(groups[i]);
 		let groupWrapper = document.createElement("div");
 		let releaseTitle = document.createElement("div");
 		let releaseTitleLink = document.createElement("a");
 		let releaseMedia = document.createElement("div");
 		let imageLink = document.createElement("a");
 		let image = document.createElement("img");
+        let releaseFooter = document.createElement("div");
 
 		groupWrapper.classList.add("groupWrapper");
-		groupWrapper.append(releaseTitle, releaseMedia);
+		groupWrapper.append(releaseTitle, releaseMedia, releaseFooter);
 
 		releaseMedia.classList.add("releaseMedia");
 		let coverBg = document.createElement("div");
@@ -393,14 +415,19 @@ var initGroups = function(){
 
 		let platform = document.createElement("div");
 		platform.classList.add(groups[i].platform);
+		platform.title = groups[i].platform;
 		platform.style.height = "15px";
 		platform.style.width = "15px";
 		platform.style.backgroundSize = "contain";
 		platform.style.translate = "-50% 20%";
 
 		releaseTitle.classList.add("releaseTitle");
-		releaseTitle.append(platform);
-		releaseTitle.append(releaseTitleLink);
+        releaseTitle.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="${groups[i].platform}" title="${groups[i].platform}" style="height:var(--platform-img-height);width:var(--platform-img-width);background-size:cover"></span>
+            <a href="${groups[i].link}" style="overflow:hidden;text-overflow:ellipsis;padding-left:6px;padding-right:6px;width:82%">${groups[i].name}</a>
+            <span></span>
+        </div>`;
 
 		image.classList.add("coverImage");
 		image.alt = groups[i].name;
@@ -411,6 +438,30 @@ var initGroups = function(){
 
 		imageLink.href = groups[i].link;
 		imageLink.append(image);
+
+        releaseFooter.classList.add("releaseFooter");
+        let rating = groups[i].userRating
+        rating = rating == "N/A" ? "" : rating;
+        let ratingColor = "";
+        if (rating !== "" && !isNaN(rating)) {
+            if (parseFloat(rating) < 0) {
+                ratingColor = "color: var(--downVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black";
+            } else if (parseFloat(rating) > 0) {
+                ratingColor = "color: var(--upVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black";
+            }
+        }
+        
+        releaseFooter.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size:var(--footer-font-size)">Rating: <span style="${ratingColor}">${rating}</span></span>
+            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${groups[i].year}</span>
+            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${groups[i].when}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+            <span style="font-size: var(--footer-font-size); visibility: ${groups[i].sticky ? 'visible' : 'hidden'}"><img src="https://gazellegames.net/static/styles/game_room/images/pin.png" style="width: 12px; height: 12px; vertical-align: middle;"></span>
+            <span style="font-size:calc(var(--footer-font-size) - var(--footer-font-minus))">${groups[i].size}</span>
+            <span style="font-size: var(--footer-font-size)">${groups[i].checked ? '<img src="https://gazellegames.net/static/styles/game_room/images/checkmark.png" style="width: 12px; height: 12px; vertical-align: middle;">' : '<img src="https://gazellegames.net/static/styles/game_room/images/crossn.png" style="width: 12px; height: 12px; vertical-align: middle;">'}</span>
+        </div>`;
 
 		document.getElementById("collageBody").append(groupWrapper);
 	}
@@ -447,7 +498,7 @@ var initTorrentInfo = function(){
 	} else {
 		for(let i=0;i<document.getElementsByClassName("group").length;i++){
 			let torrent = document.getElementsByClassName("group")[i];
-			console.log(torrent)
+			// console.log(torrent)
 			if(torrent.children[1].children[0].classList[0] == "cats_ost" || torrent.children[1].children[0].classList[0] == "cats_applications" || torrent.children[1].children[0].classList[0] == "cats_ebooks"){
 				groups.push(new Torrent(
 				torrent.children[2].children[0].children[0].getAttribute("href"),
@@ -457,7 +508,9 @@ var initTorrentInfo = function(){
 				"N/A",
 				torrent.children[3].innerHTML,
 				torrent.children[10].children[0].classList.contains("checked"),
-				torrent.classList.contains("sticky")
+				torrent.classList.contains("sticky"),
+                torrent.children[4].innerHTML,
+                torrent.children[6].innerHTML
 				))
 			} else {
 				groups.push(new Torrent(
@@ -468,7 +521,9 @@ var initTorrentInfo = function(){
 				torrent.children[2].children[4].innerHTML,
 				torrent.children[3].innerHTML,
 				torrent.children[10].children[0].classList.contains("checked"),
-				torrent.classList.contains("sticky")
+				torrent.classList.contains("sticky"),
+                torrent.children[4].innerHTML,
+                torrent.children[6].innerHTML
 				))
 			}
 		}
