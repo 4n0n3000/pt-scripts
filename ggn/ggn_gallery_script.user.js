@@ -3,7 +3,7 @@
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
-// @version      1.1.0
+// @version      1.1.1
 // @description  GGn Torrent Gallery Script
 // @include      https://gazellegames.net/torrents.php*
 // @exclude      https://gazellegames.net/torrents.php?id*
@@ -374,7 +374,7 @@ var initGallery = function(){
 	  #gallery_info{display:flex;align-items:center;justify-content:space-between;color:var(--ggn-text)}
 	  #galleryToggle{float:right;margin-left:5px;color:var(--ggn-text);text-decoration:none;cursor:pointer}
 	  #galleryToggle:hover{text-decoration:underline}
-	  #collageBody{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--ggn-width, 220px), 1fr));gap:10px;float:left;margin-top:10px;background:rgba(27,47,63,0.35);padding:8px;border-radius:6px}
+	  #collageBody{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--ggn-width, 220px), 1fr));gap:10px;float:inline-start;margin-top:10px;background:rgba(27,47,63,0.35);padding:8px;border-radius:6px;width:-moz-available;}
 	  .groupWrapper{height:auto;box-sizing:border-box;overflow:hidden;background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:scale .5s ease, box-shadow .15s ease;position:relative}
 	  .groupWrapper:hover{scale:103%;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
 	  .releaseMedia{position:static;display:flex;align-items:center;justify-content:center;aspect-ratio:3/4}
