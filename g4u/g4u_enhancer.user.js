@@ -42,7 +42,8 @@
             'rapidgator.net',
             'katfile.com',
             'gofile.io',
-            'vikingfile.com'
+            'vikingfile.com',
+            'katfile.cloud'
         ];
 
         nonUsenet.forEach(host => {
