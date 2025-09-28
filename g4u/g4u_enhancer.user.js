@@ -242,6 +242,19 @@
             }
         });
 
+        // Remove "At ddownload.com you can get an annual account..."
+        document.querySelectorAll('p').forEach(p => {
+            if (p.textContent.includes('At ddownload.com you can get an annual account')) {
+                // Find the parent element and remove it
+                const parent = p.closest('.w3-panel.w3-black.w3-center.w3-small');
+                if (parent) {
+                    parent.remove();
+                } else {
+                    p.remove();
+                }
+            }
+        });
+
     }
 
     // Function to make the Notes section collapsible - run this only once
