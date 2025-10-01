@@ -3,7 +3,7 @@
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_gallery_script.user.js
-// @version      1.1.1
+// @version      1.2.0
 // @description  GGn Torrent Gallery Script
 // @include      https://gazellegames.net/torrents.php*
 // @exclude      https://gazellegames.net/torrents.php?id*
