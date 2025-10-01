@@ -262,182 +262,298 @@ function initConfig() {
     }
 }
 
-function applyConfigStyles(){
-    try {
-        const footerDetails = (GM_config && GM_config.get) ? GM_config.get('enableFooter') : true;
-        if (footerDetails === true){
-            document.documentElement.style.setProperty('--footer-details', `block`);
-        } else {
-            document.documentElement.style.setProperty('--footer-details', `none`);
-        }
-        
-        const blur = (GM_config && GM_config.get) ? GM_config.get('blurAmount') : 18;
-        document.documentElement.style.setProperty('--ggn-blur', `${blur}px`);
-        const rows = (GM_config && GM_config.get) ? GM_config.get('widthConfig') : '5';
-        if (rows === '5'){
-            document.documentElement.style.setProperty('--ggn-width', `220px`);
-            document.documentElement.style.setProperty('--footer-font-size', '10pt');
-            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
-            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
-            document.documentElement.style.setProperty('--platform-img-width', '28px');
-            document.documentElement.style.setProperty('--platform-img-height', '28px');
-        } else if (rows === '6'){
-            document.documentElement.style.setProperty('--ggn-width', `200px`);
-            document.documentElement.style.setProperty('--footer-font-size', '9pt');
-            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
-            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
-            document.documentElement.style.setProperty('--platform-img-width', '20px');
-            document.documentElement.style.setProperty('--platform-img-height', '20px');
-        } else if (rows === '7'){
-            document.documentElement.style.setProperty('--ggn-width', `160px`);
-            document.documentElement.style.setProperty('--footer-font-size', '8pt');
-            document.documentElement.style.setProperty('--footer-font-minus', '1pt');
-            document.documentElement.style.setProperty('--footer-font-plus', '1pt');
-            document.documentElement.style.setProperty('--platform-img-width', '15px');
-            document.documentElement.style.setProperty('--platform-img-height', '15px');
-        } else if (rows === '8'){
-            document.documentElement.style.setProperty('--ggn-width', `140px`);
-            document.documentElement.style.setProperty('--footer-font-size', '7pt');
-            document.documentElement.style.setProperty('--footer-font-minus', '0.5pt');
-            document.documentElement.style.setProperty('--footer-font-plus', '0.5pt');
-            document.documentElement.style.setProperty('--platform-img-width', '10px');
-            document.documentElement.style.setProperty('--platform-img-height', '10px');
-        }
-    } catch(e) {}
-}
-
-function cacheExpiryMs(){
-    try {
-        return ((GM_config && GM_config.get) ? GM_config.get('cacheExpiryDays') : 7) * 24 * 60 * 60 * 1000;
-    } catch(e) {
-        return 7 * 24 * 60 * 60 * 1000;
+function reloadPageSafely(frame) {
+    if (frame) {
+        window.location.reload();
+    } else {
+        setTimeout(() => window.location.reload(), 250);
     }
 }
 
-function getCachedData(key){
+function getConfigValue(key, defaultValue) {
+    return (GM_config && GM_config.get) ? GM_config.get(key) : defaultValue;
+}
+
+function applyConfigStyles() {
+    try {
+        applyFooterVisibility();
+        applyBlurAmount();
+        applyCardLayout();
+    } catch (e) {
+        console.warn('[GGN Gallery] Failed to apply config styles', e);
+    }
+}
+
+function applyFooterVisibility() {
+    const footerEnabled = getConfigValue('enableFooter', true);
+    const displayValue = footerEnabled ? 'block' : 'none';
+    document.documentElement.style.setProperty('--footer-details', displayValue);
+}
+
+function applyBlurAmount() {
+    const blurAmount = getConfigValue('blurAmount', DEFAULT_BLUR_AMOUNT);
+    document.documentElement.style.setProperty('--ggn-blur', `${blurAmount}px`);
+}
+
+function applyCardLayout() {
+    const cardsPerRow = getConfigValue('widthConfig', DEFAULT_CARDS_PER_ROW);
+    const config = CARD_LAYOUT_CONFIGS[cardsPerRow];
+    
+    if (!config) return;
+    
+    document.documentElement.style.setProperty('--ggn-width', config.width);
+    document.documentElement.style.setProperty('--footer-font-size', config.fontSize);
+    document.documentElement.style.setProperty('--footer-font-minus', config.fontMinus);
+    document.documentElement.style.setProperty('--footer-font-plus', config.fontPlus);
+    document.documentElement.style.setProperty('--platform-img-width', config.imgWidth);
+    document.documentElement.style.setProperty('--platform-img-height', config.imgHeight);
+}
+
+// ========================================
+// Cache Management
+// ========================================
+function getCacheExpiryMs() {
+    try {
+        const days = getConfigValue('cacheExpiryDays', DEFAULT_CACHE_EXPIRY_DAYS);
+        return days * MILLISECONDS_PER_DAY;
+    } catch (e) {
+        return DEFAULT_CACHE_EXPIRY_DAYS * MILLISECONDS_PER_DAY;
+    }
+}
+
+function getCachedData(key) {
     try {
         const raw = GM_getValue(key, null);
         if (!raw) return null;
+        
         const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== 'object') return null;
-        const { timestamp, data } = parsed;
-        if (!timestamp) return null;
-        if ((Date.now() - timestamp) > cacheExpiryMs()) {
+        if (!isValidCacheEntry(parsed)) return null;
+        
+        if (isCacheExpired(parsed.timestamp)) {
             GM_setValue(key, null);
             return null;
         }
-        return data;
-    } catch(e){
+        
+        return parsed.data;
+    } catch (e) {
         return null;
     }
 }
 
-function setCachedData(key, data){
-    try {
-        GM_setValue(key, JSON.stringify({ timestamp: Date.now(), data }));
-    } catch(e){}
+function isValidCacheEntry(entry) {
+    return entry && typeof entry === 'object' && entry.timestamp;
 }
 
-function clearCoverCache(){
+function isCacheExpired(timestamp) {
+    return (Date.now() - timestamp) > getCacheExpiryMs();
+}
+
+function setCachedData(key, data) {
+    try {
+        const cacheEntry = {
+            timestamp: Date.now(),
+            data
+        };
+        GM_setValue(key, JSON.stringify(cacheEntry));
+    } catch (e) {
+        console.warn('[GGN Gallery] Failed to cache data', e);
+    }
+}
+
+function clearCoverCache() {
     try {
         const keys = (typeof GM_listValues === 'function') ? GM_listValues() : [];
-        let cleared = 0;
-        for (const k of keys) {
-            if (k && k.indexOf('ggn.cover:') === 0) { GM_setValue(k, null); cleared++; }
-        }
-        alert(`GGn Gallery: Cleared ${cleared} cached covers`);
-    } catch(e) {
+        const clearedCount = clearCoverCacheKeys(keys);
+        alert(`GGn Gallery: Cleared ${clearedCount} cached covers`);
+    } catch (e) {
         alert('GGn Gallery: Failed to clear cache');
     }
 }
 
-function getCachedCover(link){
-    return getCachedData(`ggn.cover:${link}`);
+function clearCoverCacheKeys(keys) {
+    let cleared = 0;
+    for (const key of keys) {
+        if (isCoverCacheKey(key)) {
+            GM_setValue(key, null);
+            cleared++;
+        }
+    }
+    return cleared;
 }
 
-function setCachedCover(link, url){
-    setCachedData(`ggn.cover:${link}`, url);
+function isCoverCacheKey(key) {
+    return key && key.startsWith(CACHE_KEY_PREFIX);
 }
 
-function applyCoverToIndex(i, url){
-    const collage = document.getElementById("collageBody");
+function getCachedCover(link) {
+    return getCachedData(`${CACHE_KEY_PREFIX}${link}`);
+}
+
+function setCachedCover(link, url) {
+    setCachedData(`${CACHE_KEY_PREFIX}${link}`, url);
+}
+
+// ========================================
+// Cover Image Management
+// ========================================
+function applyCoverToIndex(index, url) {
+    const collage = document.getElementById('collageBody');
     if (!collage) return;
-    const card = collage.children[i];
+    
+    const card = collage.children[index];
     if (!card) return;
-    const img = card.getElementsByTagName("img")[0];
-    const bg = card.querySelector(".coverBg");
-    if (url){
-        img.src = url;
-        if (bg) bg.style.backgroundImage = "url('" + url.replace(/'/g, "\\'") + "')";
-        if (groups[i]) groups[i].img = url;
+    
+    const img = card.getElementsByTagName('img')[0];
+    const bg = card.querySelector('.coverBg');
+    
+    if (url) {
+        updateCardWithCover(img, bg, url, index);
     } else {
-        if (img) img.classList.add("no-image");
+        markImageAsUnavailable(img);
     }
 }
 
-var initImages = function(){
-    document.querySelectorAll("[title='View Torrent']").forEach(function (item) {
-        var link = item.getAttribute("href");
-        var cached = getCachedCover(link);
-        if (cached){
-            for(let i=0;i<groups.length;i++){
-                if(groups[i].link == link){
-                    applyCoverToIndex(i, cached);
-                    break;
-                }
-            }
+function updateCardWithCover(img, bg, url, index) {
+    img.src = url;
+    if (bg) {
+        bg.style.backgroundImage = `url('${escapeSingleQuotes(url)}')`;
+    }
+    if (state.groups[index]) {
+        state.groups[index].img = url;
+    }
+}
+
+function escapeSingleQuotes(str) {
+    return str.replace(/'/g, "\\'");
+}
+
+function markImageAsUnavailable(img) {
+    if (img) {
+        img.classList.add('no-image');
+    }
+}
+
+function initImages() {
+    const torrentLinks = document.querySelectorAll(DOM_SELECTORS.TORRENT_LINK);
+    torrentLinks.forEach(item => {
+        const link = item.getAttribute('href');
+        const cachedCover = getCachedCover(link);
+        
+        if (cachedCover) {
+            applyCachedCoverToGroup(link, cachedCover);
             return;
         }
-        GM_xmlhttpRequest({
-            method: "GET",
-            url: "/" + link,
-            onload: function (response) {
-                if (!response.responseXML) response.responseXML = new DOMParser().parseFromString(response.responseText, "text/html");
-                    var imgNode = response.responseXML.querySelector(".box_albumart img");
-                    var image_src = imgNode ? imgNode.getAttribute("src") : "";
-                    for(let i=0;i<groups.length;i++){
-                        if(groups[i].link == link){
-                            if (image_src) setCachedCover(link, image_src);
-                            applyCoverToIndex(i, image_src);
-                            break;
-                        }
-                    }
-            }
-        });
+        
+        fetchCoverImage(link);
     });
 }
 
-var initGallery = function(){
-	let gallery = document.createElement("div");
-	gallery.id = "gallery_view";
+function applyCachedCoverToGroup(link, coverUrl) {
+    const index = findGroupIndexByLink(link);
+    if (index !== -1) {
+        applyCoverToIndex(index, coverUrl);
+    }
+}
 
-	let galleryInfo = document.createElement("div");
-	galleryInfo.id = "gallery_info";
+function findGroupIndexByLink(link) {
+    return state.groups.findIndex(group => group.link === link);
+}
 
-	let galleryTitle = document.createElement("strong");
-	galleryTitle.innerHTML = "Gallery";
+function fetchCoverImage(link) {
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: `/${link}`,
+        onload: response => handleCoverImageResponse(response, link)
+    });
+}
 
-	let galleryToggle = document.createElement("a");
-	galleryToggle.id = "galleryToggle";
-	galleryToggle.innerHTML = "[Toggle]";
-	galleryToggle.style.cssText += "float:right; margin-left:5px";
+function handleCoverImageResponse(response, link) {
+    const doc = parseResponseDocument(response);
+    const imgNode = doc.querySelector(DOM_SELECTORS.ALBUM_ART);
+    const imageSrc = imgNode ? imgNode.getAttribute('src') : '';
+    
+    const index = findGroupIndexByLink(link);
+    if (index !== -1) {
+        if (imageSrc) {
+            setCachedCover(link, imageSrc);
+        }
+        applyCoverToIndex(index, imageSrc);
+    }
+}
 
-	let collage = document.createElement("div");
-	collage.id = "collageBody";
+function parseResponseDocument(response) {
+    if (!response.responseXML) {
+        return new DOMParser().parseFromString(response.responseText, 'text/html');
+    }
+    return response.responseXML;
+}
 
-	galleryInfo.append(galleryTitle);
-	galleryInfo.append(galleryToggle);
-	gallery.append(galleryInfo);
-	gallery.append(collage);
-	if (altPage){
-		document.getElementById("content").children[0].insertBefore(gallery, document.getElementById("content").children[0].children[3])
-		document.getElementById("content").children[0].children[4].style = "margin-top:5px;"
-	} else {
-		document.getElementById("content").children[1].insertBefore(gallery, document.getElementById("content").children[1].children[3])
-	}
+// ========================================
+// Gallery UI Creation
+// ========================================
+function initGallery() {
+    const gallery = createGalleryContainer();
+    insertGalleryIntoPage(gallery);
+    injectGalleryStyles();
+    attachGalleryEventListeners();
+}
 
-	let style = document.createElement("style");
-	style.innerHTML = `
+function createGalleryContainer() {
+    const gallery = createElement('div', { id: 'gallery_view' });
+    const galleryInfo = createGalleryInfo();
+    const collage = createElement('div', { id: 'collageBody' });
+    
+    gallery.append(galleryInfo, collage);
+    return gallery;
+}
+
+function createGalleryInfo() {
+    const galleryInfo = createElement('div', { id: 'gallery_info' });
+    const galleryTitle = createElement('strong', { innerHTML: 'Gallery' });
+    const galleryToggle = createElement('a', {
+        id: 'galleryToggle',
+        innerHTML: '[Toggle]',
+        style: 'float:right; margin-left:5px'
+    });
+    
+    galleryInfo.append(galleryTitle, galleryToggle);
+    return galleryInfo;
+}
+
+function createElement(tag, attributes = {}) {
+    const element = document.createElement(tag);
+    Object.entries(attributes).forEach(([key, value]) => {
+        if (key === 'style') {
+            element.style.cssText = value;
+        } else {
+            element[key] = value;
+        }
+    });
+    return element;
+}
+
+function insertGalleryIntoPage(gallery) {
+    const content = document.getElementById('content');
+    const contentIndex = state.isAlternativePage ? 0 : 1;
+    const targetChild = content.children[contentIndex];
+    
+    targetChild.insertBefore(gallery, targetChild.children[CONTENT_CHILD_INDICES.GALLERY_INSERT_POSITION]);
+    
+    if (state.isAlternativePage) {
+        targetChild.children[CONTENT_CHILD_INDICES.ORIGINAL_TABLE_POSITION].style.marginTop = '5px';
+    }
+}
+
+function attachGalleryEventListeners() {
+    const toggleButton = document.getElementById('galleryToggle');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', toggleGallery);
+    }
+}
+
+function injectGalleryStyles() {
+    const style = document.createElement('style');
+    style.innerHTML = `
 	  :root{--ggn-card-bg:#1c3145;--ggn-card-bg2:#2b4e66;--ggn-text:#e6f1f7;--ggn-muted:#97a8b6;--ggn-overlay:rgba(0,0,0,0.35);}
 	  #gallery_view{background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));padding:8px;border-radius:6px}
 	  #gallery_info{display:flex;align-items:center;justify-content:space-between;color:var(--ggn-text)}
