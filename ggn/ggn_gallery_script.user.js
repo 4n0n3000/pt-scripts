@@ -570,151 +570,216 @@ function injectGalleryStyles() {
 	  .releaseFooter{text-align:center;font-size:10pt;display:var(--footer-details);padding:10px;overflow:hidden;line-height:1.3;white-space:nowrap;text-overflow:ellipsis;color:var(--ggn-text);background:linear-gradient(var(--ggn-card-bg2),var(--ggn-card-bg));position:relative;z-index:1;font-weight:bold}
       .hiddenType{color:#525252 !important;text-decoration:line-through}
 	`;
-	document.getElementsByTagName("head")[0].append(style);
-
-	document.getElementById("galleryToggle").addEventListener("click", toggleGallery);
+    document.head.append(style);
 }
 
-var initGroups = function(){
-	document.getElementById("collageBody").innerHTML="";
-	for(let i=0;i<groups.length;i++){
-		let groupWrapper = document.createElement("div");
-		let releaseTitle = document.createElement("div");
-		let releaseTitleLink = document.createElement("a");
-		let releaseMedia = document.createElement("div");
-		let imageLink = document.createElement("a");
-		let image = document.createElement("img");
-        let releaseFooter = document.createElement("div");
+// ========================================
+// Group Card Rendering
+// ========================================
+function initGroups() {
+    const collage = document.getElementById('collageBody');
+    if (!collage) return;
+    
+    collage.innerHTML = '';
+    state.groups.forEach((group, index) => {
+        const card = createGroupCard(group, index);
+        collage.append(card);
+    });
+}
 
-		groupWrapper.classList.add("groupWrapper");
-		groupWrapper.append(releaseTitle, releaseMedia, releaseFooter);
+function createGroupCard(group) {
+    const groupWrapper = createElement('div', { className: 'groupWrapper' });
+    const releaseTitle = createReleaseTitle(group);
+    const releaseMedia = createReleaseMedia(group);
+    const releaseFooter = createReleaseFooter(group);
+    
+    groupWrapper.append(releaseTitle, releaseMedia, releaseFooter);
+    return groupWrapper;
+}
 
-		releaseMedia.classList.add("releaseMedia");
-		let coverBg = document.createElement("div");
-		coverBg.classList.add("coverBg");
-		releaseMedia.append(coverBg);
-		releaseMedia.append(imageLink);
-
-		releaseTitleLink.href = groups[i].link
-		releaseTitleLink.innerHTML = `${groups[i].name}`;
-
-		let platform = document.createElement("div");
-		platform.classList.add(groups[i].platform);
-		platform.title = groups[i].platform;
-		platform.style.height = "15px";
-		platform.style.width = "15px";
-		platform.style.backgroundSize = "contain";
-		platform.style.translate = "-50% 20%";
-
-		releaseTitle.classList.add("releaseTitle");
-        releaseTitle.innerHTML = `
+function createReleaseTitle(group) {
+    const releaseTitle = createElement('div', { className: 'releaseTitle' });
+    releaseTitle.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span class="${groups[i].platform}" title="${groups[i].platform}" style="height:var(--platform-img-height);width:var(--platform-img-width);background-size:cover"></span>
-            <a href="${groups[i].link}" style="overflow:hidden;text-overflow:ellipsis;padding-left:6px;padding-right:6px;width:82%">${groups[i].name}</a>
+            <span class="${group.platform}" title="${group.platform}" style="height:var(--platform-img-height);width:var(--platform-img-width);background-size:cover"></span>
+            <a href="${group.link}" style="overflow:hidden;text-overflow:ellipsis;padding-left:6px;padding-right:6px;width:82%">${group.name}</a>
             <span></span>
         </div>`;
+    return releaseTitle;
+}
 
-		image.classList.add("coverImage");
-		image.alt = groups[i].name;
-		image.loading = "lazy";
-		image.decoding = "async";
-		image.src = groups[i].img;
-		image.addEventListener('error', function(){ image.classList.add('no-image'); });
+function createReleaseMedia(group) {
+    const releaseMedia = createElement('div', { className: 'releaseMedia' });
+    const coverBg = createElement('div', { className: 'coverBg' });
+    const imageLink = createElement('a', { href: group.link });
+    const image = createCoverImage(group);
+    
+    imageLink.append(image);
+    releaseMedia.append(coverBg, imageLink);
+    return releaseMedia;
+}
 
-		imageLink.href = groups[i].link;
-		imageLink.append(image);
+function createCoverImage(group) {
+    const image = createElement('img', {
+        className: 'coverImage',
+        alt: group.name,
+        src: group.img
+    });
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.addEventListener('error', () => image.classList.add('no-image'));
+    return image;
+}
 
-        releaseFooter.classList.add("releaseFooter");
-        let rating = groups[i].userRating
-        rating = rating == "N/A" ? "" : rating;
-        let ratingColor = "";
-        if (rating !== "" && !isNaN(rating)) {
-            if (parseFloat(rating) < 0) {
-                ratingColor = "color: var(--downVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black";
-            } else if (parseFloat(rating) > 0) {
-                ratingColor = "color: var(--upVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black";
-            }
-        }
-        
-        releaseFooter.innerHTML = `
+function createReleaseFooter(group) {
+    const releaseFooter = createElement('div', { className: 'releaseFooter' });
+    const ratingDisplay = formatRatingDisplay(group.userRating);
+    const stickyVisibility = group.sticky ? 'visible' : 'hidden';
+    const checkIcon = group.checked ? 'checkmark.png' : 'crossn.png';
+    
+    releaseFooter.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size:var(--footer-font-size)">Rating: <span style="${ratingColor}">${rating}</span></span>
-            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${groups[i].year}</span>
-            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${groups[i].when}</span>
+            <span style="font-size:var(--footer-font-size)">Rating: <span style="${ratingDisplay.style}">${ratingDisplay.text}</span></span>
+            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${group.year}</span>
+            <span style="font-size:calc(var(--footer-font-size) + var(--footer-font-plus))">${group.when}</span>
         </div>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-            <span style="font-size: var(--footer-font-size); visibility: ${groups[i].sticky ? 'visible' : 'hidden'}"><img src="https://gazellegames.net/static/styles/game_room/images/pin.png" style="width: 12px; height: 12px; vertical-align: middle;"></span>
-            <span style="font-size:calc(var(--footer-font-size) - var(--footer-font-minus))">${groups[i].size}</span>
-            <span style="font-size: var(--footer-font-size)">${groups[i].checked ? '<img src="https://gazellegames.net/static/styles/game_room/images/checkmark.png" style="width: 12px; height: 12px; vertical-align: middle;">' : '<img src="https://gazellegames.net/static/styles/game_room/images/crossn.png" style="width: 12px; height: 12px; vertical-align: middle;">'}</span>
+            <span style="font-size: var(--footer-font-size); visibility: ${stickyVisibility}"><img src="https://gazellegames.net/static/styles/game_room/images/pin.png" style="width: 12px; height: 12px; vertical-align: middle;"></span>
+            <span style="font-size:calc(var(--footer-font-size) - var(--footer-font-minus))">${group.size}</span>
+            <span style="font-size: var(--footer-font-size)"><img src="https://gazellegames.net/static/styles/game_room/images/${checkIcon}" style="width: 12px; height: 12px; vertical-align: middle;"></span>
         </div>`;
-
-		document.getElementById("collageBody").append(groupWrapper);
-	}
+    return releaseFooter;
 }
 
-var initTorrentInfo = function(){
-	if(altPage){
-		let torrentList = document.getElementById("content").children[0].children[3].children[0];
-		for(let i=1;i<torrentList.children.length;i++){
-			if(torrentList.children[i].children[0].children[0].classList[0] == "cats_ost" || torrentList.children[i].children[0].children[0].classList[0] == "cats_applications" || torrentList.children[i].children[0].children[0].classList[0] == "cats_ebooks"){
-				groups.push(new Torrent(
-				torrentList.children[i].children[1].children[1].children[0].getAttribute("href"),
-				torrentList.children[i].children[1].children[1].children[0].innerHTML.split(" <")[0],
-				torrentList.children[i].children[0].children[0].classList[0],
-				"N/A",
-				"N/A",
-				"N/A",
-				"N/A",
-				"N/A"
-				))
-			} else {
-				groups.push(new Torrent(
-				torrentList.children[i].children[1].children[2].children[0].getAttribute("href"),
-				torrentList.children[i].children[1].children[2].children[0].innerHTML.split(" <")[0],
-				torrentList.children[i].children[0].children[0].classList[0],
-				"N/A",
-				"N/A",
-				"N/A",
-				"N/A",
-				"N/A"
-				))
-			}
-			}
-	} else {
-		for(let i=0;i<document.getElementsByClassName("group").length;i++){
-			let torrent = document.getElementsByClassName("group")[i];
-			// console.log(torrent)
-			if(torrent.children[1].children[0].classList[0] == "cats_ost" || torrent.children[1].children[0].classList[0] == "cats_applications" || torrent.children[1].children[0].classList[0] == "cats_ebooks"){
-				groups.push(new Torrent(
-				torrent.children[2].children[0].children[0].getAttribute("href"),
-				torrent.children[2].children[0].children[0].innerHTML,
-				torrent.children[1].children[0].classList[0],
-				torrent.children[2].children[1].innerHTML.substring(1,5),
-				"N/A",
-				torrent.children[3].innerHTML,
-				torrent.children[10].children[0].classList.contains("checked"),
-				torrent.classList.contains("sticky"),
-                torrent.children[4].innerHTML,
-                torrent.children[6].innerHTML
-				))
-			} else {
-				groups.push(new Torrent(
-				torrent.children[2].children[2].children[0].getAttribute("href"),
-				torrent.children[2].children[2].children[0].innerHTML,
-				torrent.children[1].children[0].classList[0],
-				torrent.children[2].children[3].innerHTML.substring(1,5),
-				torrent.children[2].children[4].innerHTML,
-				torrent.children[3].innerHTML,
-				torrent.children[10].children[0].classList.contains("checked"),
-				torrent.classList.contains("sticky"),
-                torrent.children[4].innerHTML,
-                torrent.children[6].innerHTML
-				))
-			}
-		}
-	}
+function formatRatingDisplay(rating) {
+    if (rating === 'N/A' || rating === '') {
+        return { text: '', style: '' };
+    }
+    
+    const numericRating = parseFloat(rating);
+    if (isNaN(numericRating)) {
+        return { text: rating, style: '' };
+    }
+    
+    if (numericRating < 0) {
+        return {
+            text: rating,
+            style: 'color: var(--downVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black'
+        };
+    }
+    
+    if (numericRating > 0) {
+        return {
+            text: rating,
+            style: 'color: var(--upVote);font-family:mario;font-weight:lighter;text-shadow:2px 1px black'
+        };
+    }
+    
+    return { text: rating, style: '' };
 }
 
+// ========================================
+// Torrent Data Extraction
+// ========================================
+function initTorrentInfo() {
+    if (state.isAlternativePage) {
+        extractTorrentsFromAlternativePage();
+    } else {
+        extractTorrentsFromStandardPage();
+    }
+}
+
+function extractTorrentsFromAlternativePage() {
+    const content = document.getElementById('content');
+    const torrentList = content.children[0].children[CONTENT_CHILD_INDICES.TORRENT_LIST_POSITION].children[0];
+    
+    for (let i = 1; i < torrentList.children.length; i++) {
+        const row = torrentList.children[i];
+        const torrent = parseAlternativePageTorrent(row);
+        state.groups.push(torrent);
+    }
+}
+
+function parseAlternativePageTorrent(row) {
+    const category = row.children[0].children[0].classList[0];
+    const isSpecialCategory = isSpecialCategoryType(category);
+    
+    if (isSpecialCategory) {
+        return new Torrent(
+            row.children[1].children[1].children[0].getAttribute('href'),
+            row.children[1].children[1].children[0].innerHTML.split(' <')[0],
+            category,
+            'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
+        );
+    }
+    
+    return new Torrent(
+        row.children[1].children[2].children[0].getAttribute('href'),
+        row.children[1].children[2].children[0].innerHTML.split(' <')[0],
+        category,
+        'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
+    );
+}
+
+function extractTorrentsFromStandardPage() {
+    const torrentElements = document.querySelectorAll(DOM_SELECTORS.GROUP_CLASS);
+    
+    torrentElements.forEach(torrentElement => {
+        const torrent = parseStandardPageTorrent(torrentElement);
+        state.groups.push(torrent);
+    });
+}
+
+function parseStandardPageTorrent(torrentElement) {
+    const category = torrentElement.children[1].children[0].classList[0];
+    const isSpecialCategory = isSpecialCategoryType(category);
+    
+    if (isSpecialCategory) {
+        return createSpecialCategoryTorrent(torrentElement, category);
+    }
+    
+    return createStandardTorrent(torrentElement, category);
+}
+
+function isSpecialCategoryType(category) {
+    return category === CATEGORY_TYPES.OST ||
+           category === CATEGORY_TYPES.APPLICATIONS ||
+           category === CATEGORY_TYPES.EBOOKS;
+}
+
+function createSpecialCategoryTorrent(element, category) {
+    return new Torrent(
+        element.children[2].children[0].children[0].getAttribute('href'),
+        element.children[2].children[0].children[0].innerHTML,
+        category,
+        element.children[2].children[1].innerHTML.substring(1, 5),
+        'N/A',
+        element.children[3].innerHTML,
+        element.children[10].children[0].classList.contains('checked'),
+        element.classList.contains('sticky'),
+        element.children[4].innerHTML,
+        element.children[6].innerHTML
+    );
+}
+
+function createStandardTorrent(element, category) {
+    return new Torrent(
+        element.children[2].children[2].children[0].getAttribute('href'),
+        element.children[2].children[2].children[0].innerHTML,
+        category,
+        element.children[2].children[3].innerHTML.substring(1, 5),
+        element.children[2].children[4].innerHTML,
+        element.children[3].innerHTML,
+        element.children[10].children[0].classList.contains('checked'),
+        element.classList.contains('sticky'),
+        element.children[4].innerHTML,
+        element.children[6].innerHTML
+    );
+}
+
+// ========================================
+// Script Initialization
+// ========================================
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init, { once: true });
 } else {
