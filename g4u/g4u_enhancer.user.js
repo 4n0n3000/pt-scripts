@@ -513,41 +513,36 @@
         }
         `;
 
-        // Create a style element and append the CSS
         const styleElement = document.createElement('style');
         styleElement.textContent = darkModeCSS;
         document.head.appendChild(styleElement);
     }
 
-    // Run our functions when DOM is loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            removePromotionalElements();
-            // Run the notes collapsible function only once when the DOM is fully loaded
-            setTimeout(makeNotesCollapsible, 500);
-            // Add dark mode functionality
-            addDarkModeCSS();
-            addDarkModeToggle();
-            addUsenetModeToggle();
-        });
-    } else {
+    // ========================================
+    // Initialization
+    // ========================================
+
+    /**
+     * Initializes all enhancements
+     */
+    function initialize() {
         removePromotionalElements();
-        // Run the notes collapsible function only once when the DOM is fully loaded
-        setTimeout(makeNotesCollapsible, 500);
-        // Add dark mode functionality
+        setTimeout(makeNotesCollapsible, TIMEOUTS.NOTES_COLLAPSIBLE);
         addDarkModeCSS();
         addDarkModeToggle();
         addUsenetModeToggle();
     }
 
-    // Create a MutationObserver to handle dynamically added elements
-    const observer = new MutationObserver(function() {
-        removePromotionalElements();
-        // We don't call makeNotesCollapsible here to avoid the loop
-    });
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initialize);
+    } else {
+        initialize();
+    }
 
-    // Start observing the document body for changes
     window.addEventListener('load', function() {
+        nullifyPopupFunction();
+
+        const observer = new MutationObserver(removePromotionalElements);
         observer.observe(document.body, { childList: true, subtree: true });
     });
 })();
