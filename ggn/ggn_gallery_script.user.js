@@ -20,57 +20,130 @@
 // ==/UserScript==
 // Thanks RobotFish for the barebones script
 
-function Torrent(link, name, platform, year, ageRating, userRating, checked, sticky, when, size){
-	this.link = link;
-	this.name = name;
-	this.img = "";
-	this.platform = platform;
-	this.year = year;
-	this.ageRating = ageRating;
-	this.userRating = userRating;
-	this.checked = checked;
-	this.sticky = sticky;
-    this.when = when;
-    this.size = size;
-}
-let groups = [];
-let showGallery = localStorage.getItem("galleryView") == "false" ? false : true;
-let altPage = window.location.href.split("&type=").length > 1 || window.location.href.split("?type=").length > 1
-var init = function(){
-    initConfig();
-	initTorrentInfo();
-	initGallery();
-	initGroups();
-	initImages();
-	applyGalleryState();
-}
+// ========================================
+// Constants
+// ========================================
+const STORAGE_KEY_GALLERY_VIEW = 'galleryView';
+const CACHE_KEY_PREFIX = 'ggn.cover:';
+const CONFIG_ID = 'GGN_Gallery_Config';
+const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
+const DEFAULT_CACHE_EXPIRY_DAYS = 7;
+const DEFAULT_BLUR_AMOUNT = 18;
+const DEFAULT_CARDS_PER_ROW = '5';
 
-var applyGalleryState = function(){
-	const collage = document.getElementById("collageBody");
-	if (!collage) return;
-	collage.style.display = showGallery ? "" : "none";
-	try {
-		if (altPage){
-			const original = document.getElementById("content").children[0].children[4].children[0];
-			if (original) original.style.display = showGallery ? "none" : "";
-		} else {
-			const original = document.getElementById("content").children[1].children[4].children[0];
-			if (original) original.style.display = showGallery ? "none" : "";
-		}
-	} catch(e){
-		const table = document.querySelector("#torrent_table, .grouping, .box .pad table");
-		if (table) table.style.display = showGallery ? "none" : "";
-	}
+const CARD_LAYOUT_CONFIGS = {
+    '5': { width: '220px', fontSize: '10pt', fontMinus: '1pt', fontPlus: '1pt', imgWidth: '28px', imgHeight: '28px' },
+    '6': { width: '200px', fontSize: '9pt', fontMinus: '1pt', fontPlus: '1pt', imgWidth: '20px', imgHeight: '20px' },
+    '7': { width: '160px', fontSize: '8pt', fontMinus: '1pt', fontPlus: '1pt', imgWidth: '15px', imgHeight: '15px' },
+    '8': { width: '140px', fontSize: '7pt', fontMinus: '0.5pt', fontPlus: '0.5pt', imgWidth: '10px', imgHeight: '10px' }
 };
 
-var toggleGallery = function(){
-	showGallery = !showGallery;
-	localStorage.setItem("galleryView", showGallery ? true : false);
-	applyGalleryState();
+const CATEGORY_TYPES = {
+    OST: 'cats_ost',
+    APPLICATIONS: 'cats_applications',
+    EBOOKS: 'cats_ebooks'
+};
+
+const DOM_SELECTORS = {
+    TORRENT_LINK: "[title='View Torrent']",
+    ALBUM_ART: '.box_albumart img',
+    TORRENT_TABLE: '#torrent_table, .grouping, .box .pad table',
+    GROUP_CLASS: '.group'
+};
+
+const CONTENT_CHILD_INDICES = {
+    GALLERY_INSERT_POSITION: 3,
+    TORRENT_LIST_POSITION: 3,
+    ORIGINAL_TABLE_POSITION: 4
+};
+
+// ========================================
+// Data Models
+// ========================================
+class Torrent {
+    constructor(link, name, platform, year, ageRating, userRating, checked, sticky, when, size) {
+        this.link = link;
+        this.name = name;
+        this.img = '';
+        this.platform = platform;
+        this.year = year;
+        this.ageRating = ageRating;
+        this.userRating = userRating;
+        this.checked = checked;
+        this.sticky = sticky;
+        this.when = when;
+        this.size = size;
+    }
 }
 
-let saved;
-function initConfig(){
+// ========================================
+// State Management
+// ========================================
+const state = {
+    groups: [],
+    showGallery: localStorage.getItem(STORAGE_KEY_GALLERY_VIEW) !== 'false',
+    isAlternativePage: isAlternativePageLayout(),
+    configSaved: false
+};
+
+function isAlternativePageLayout() {
+    const url = window.location.href;
+    return url.includes('&type=') || url.includes('?type=');
+}
+
+// ========================================
+// Initialization
+// ========================================
+function init() {
+    initConfig();
+    initTorrentInfo();
+    initGallery();
+    initGroups();
+    initImages();
+    applyGalleryState();
+}
+
+// ========================================
+// Gallery State Management
+// ========================================
+function applyGalleryState() {
+    const collage = document.getElementById('collageBody');
+    if (!collage) return;
+    
+    const displayValue = state.showGallery ? '' : 'none';
+    const inverseDisplayValue = state.showGallery ? 'none' : '';
+    
+    collage.style.display = displayValue;
+    toggleOriginalTable(inverseDisplayValue);
+}
+
+function toggleOriginalTable(displayValue) {
+    try {
+        const contentIndex = state.isAlternativePage ? 0 : 1;
+        const content = document.getElementById('content');
+        const original = content?.children[contentIndex]?.children[CONTENT_CHILD_INDICES.ORIGINAL_TABLE_POSITION]?.children[0];
+        
+        if (original) {
+            original.style.display = displayValue;
+        }
+    } catch (e) {
+        const table = document.querySelector(DOM_SELECTORS.TORRENT_TABLE);
+        if (table) {
+            table.style.display = displayValue;
+        }
+    }
+}
+
+function toggleGallery() {
+    state.showGallery = !state.showGallery;
+    localStorage.setItem(STORAGE_KEY_GALLERY_VIEW, state.showGallery);
+    applyGalleryState();
+}
+
+// ========================================
+// Configuration Management
+// ========================================
+function initConfig() {
     try {
         GM_config.init({
             id: 'GGN_Gallery_Config',
