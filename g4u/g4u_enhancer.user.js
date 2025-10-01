@@ -18,340 +18,341 @@
 (function() {
     'use strict';
 
-    // Nullify the openPopup function
-    window.addEventListener('load', function() {
+    // ========================================
+    // Constants
+    // ========================================
+    const STORAGE_KEYS = {
+        DARK_MODE: 'g4u-dark-mode',
+        USENET_MODE: 'g4u-usenet-mode'
+    };
+
+    const GAME_PAGE_REGEX = /^https:\/\/g4u\.to\/\w+\/\d+-.*/;
+
+    const NON_USENET_HOSTS = [
+        'ddownload.com',
+        'rapidgator.net',
+        'katfile.com',
+        'gofile.io',
+        'vikingfile.com',
+        'katfile.cloud'
+    ];
+
+    const PROMOTIONAL_SELECTORS = {
+        supportParagraph: 'Would you like to support us? Thanks!',
+        wannaSupportParagraph: 'Wanna support us?',
+        ddownloadBanner: 'At ddownload.com you can get an annual account',
+        vpnAdvertisement: 'Use a VPN to unlock the streaming & downloading - Signup Now!',
+        freeHighspeedDownload: '⚡ Free Highspeed Download',
+        highspeedDownload: '⚡ Highspeed Download',
+        FreeHostsAndNZBsNotice: 'Since free hosts and NZBs don’t generate support for us, we finance services like'
+    };
+
+    const TIMEOUTS = {
+        NOTES_COLLAPSIBLE: 500
+    };
+
+    const BUTTON_CONFIG = {
+        darkMode: {
+            position: 'fixed',
+            bottom: '60px',
+            right: '20px',
+            zIndex: '1000',
+            padding: '8px 16px',
+            opacity: '0.8',
+            color: '#a2a2a2'
+        },
+        usenetMode: {
+            position: 'relative',
+            opacity: '0.8'
+        }
+    };
+
+    const BUTTON_TEXT = {
+        darkMode: {
+            enabled: '☀️ Light Mode',
+            disabled: '🌙 Dark Mode'
+        },
+        usenetMode: {
+            enabled: '🧠 NZB Mode',
+            disabled: '💩 DDL + NZB Mode'
+        }
+    };
+
+    // ========================================
+    // Utility Functions
+    // ========================================
+
+    /**
+     * Checks if the current page is a game page
+     */
+    function isOnGamePage() {
+        return GAME_PAGE_REGEX.test(window.location.href);
+    }
+
+    /**
+     * Gets a boolean value from localStorage
+     */
+    function getStorageBoolean(key) {
+        return localStorage.getItem(key) === 'true';
+    }
+
+    /**
+     * Sets a boolean value in localStorage
+     */
+    function setStorageBoolean(key, value) {
+        localStorage.setItem(key, value ? 'true' : 'false');
+    }
+
+    /**
+     * Removes elements matching a selector
+     */
+    function removeElements(selector, callback = null) {
+        document.querySelectorAll(selector).forEach(element => {
+            if (callback) {
+                callback(element);
+            } else {
+                element.remove();
+            }
+        });
+    }
+
+    /**
+     * Removes elements containing specific text
+     */
+    function removeElementsByText(selector, textContent, parentSelector = null) {
+        document.querySelectorAll(selector).forEach(element => {
+            if (element.textContent.includes(textContent)) {
+                if (parentSelector) {
+                    const parent = element.closest(parentSelector);
+                    if (parent) {
+                        parent.remove();
+                        return;
+                    }
+                }
+                element.remove();
+            }
+        });
+    }
+
+    // ========================================
+    // Popup Blocker
+    // ========================================
+
+    /**
+     * Nullifies the openPopup function to prevent popups
+     */
+    function nullifyPopupFunction() {
         if (typeof window.openPopup !== 'undefined') {
             window.openPopup = function() {
-                // Do nothing - function nullified
-                console.log("openPopup function called but nullified");
+                console.log('openPopup function called but nullified');
                 return false;
             };
         }
-    });
-
-    // Check if we're on a game page
-    function isOnGamePage() {
-        const regex = /^https:\/\/g4u\.to\/..\/\d+-.*/;
-        return regex.test(window.location.href);
     }
 
+    // ========================================
+    // Usenet Mode
+    // ========================================
 
-    function usenetMode(isUsenetModeEnabled) {
-        const nonUsenet = [
-            'ddownload.com',
-            'rapidgator.net',
-            'katfile.com',
-            'gofile.io',
-            'vikingfile.com',
-            'katfile.cloud'
-        ];
-
-        nonUsenet.forEach(host => {
-            document.querySelectorAll(`img[alt="${host}"]`).forEach(img => {
+    /**
+     * Toggles visibility of non-Usenet download hosts
+     */
+    function toggleNonUsenetHosts(isUsenetModeEnabled) {
+        NON_USENET_HOSTS.forEach(host => {
+            removeElements(`img[alt="${host}"]`, (img) => {
                 const tableRow = img.closest('div');
                 if (tableRow) {
-                    if (isUsenetModeEnabled) {
-                        // Hide the row when Usenet mode is enabled
-                        tableRow.style.display = 'none';
-                    } else {
-                        // Show the row when Default mode is enabled
-                        tableRow.style.display = '';
-                    }
+                    tableRow.style.display = isUsenetModeEnabled ? 'none' : '';
                 }
             });
         });
     }
 
+    /**
+     * Creates and configures the Usenet mode toggle button
+     */
+    function createUsenetToggleButton() {
+        const button = document.createElement('button');
+        button.className = 'usenet-mode-toggle w3-button w3-round w3-small';
+        Object.assign(button.style, BUTTON_CONFIG.usenetMode);
+
+        const isUsenetMode = getStorageBoolean(STORAGE_KEYS.USENET_MODE);
+
+        if (isUsenetMode) {
+            document.body.classList.add('usenet-mode');
+            toggleNonUsenetHosts(true);
+        }
+
+        button.textContent = isUsenetMode ? BUTTON_TEXT.usenetMode.enabled : BUTTON_TEXT.usenetMode.disabled;
+
+        button.addEventListener('click', function() {
+            const isEnabled = document.body.classList.toggle('usenet-mode');
+            toggleNonUsenetHosts(isEnabled);
+            setStorageBoolean(STORAGE_KEYS.USENET_MODE, isEnabled);
+            button.textContent = isEnabled ? BUTTON_TEXT.usenetMode.enabled : BUTTON_TEXT.usenetMode.disabled;
+        });
+
+        return button;
+    }
+
+    /**
+     * Adds the Usenet mode toggle button to the page
+     */
     function addUsenetModeToggle() {
-        // Only proceed if we're on the correct page
         if (!isOnGamePage()) {
             return;
         }
 
-        // Create the Usenet Mode toggle button
-        const usenet_toggleButton = document.createElement('button');
-        usenet_toggleButton.textContent = '🧠 NZB Mode';
-        usenet_toggleButton.className = 'usenet-mode-toggle w3-button w3-round w3-small';
-        usenet_toggleButton.style.position = 'relative';
-        usenet_toggleButton.style.opacity = '0.8';
-
-        // Check if dark mode is already enabled from localStorage
-        const isUsenetMode = localStorage.getItem('g4u-usenet-mode') === 'true';
-
-        // Apply Usenet mode if it was previously enabled
-        if (isUsenetMode) {
-            document.body.classList.add('usenet-mode');
-            usenetMode(isUsenetMode)
-            usenet_toggleButton.textContent = '🧠 NZB Mode';
-        } else {
-            usenet_toggleButton.textContent = '💩 DDL + NZB Mode';
-        }
-
-        // Add click event to toggle dark mode
-        usenet_toggleButton.addEventListener('click', function() {
-            const isUsenetModeEnabled = document.body.classList.toggle('usenet-mode');
-            usenetMode(isUsenetModeEnabled)
-            localStorage.setItem('g4u-usenet-mode', isUsenetModeEnabled ? 'true' : 'false');
-            // Update button text
-            usenet_toggleButton.textContent = isUsenetModeEnabled ? '🧠 NZB Mode' : '💩 DDL + NZB Mode';
-        });
-
-        // Add the button to the page
-
-        // Create a new table row
+        const button = createUsenetToggleButton();
         const newRow = document.createElement('tr');
-
-        // Create a table cell to contain the button
         const newCell = document.createElement('td');
-        newCell.colSpan = 3; // Make the cell span across all columns
-        newCell.style.textAlign = "center"; // Center the content
 
-        // Add the button to the cell
-        newCell.appendChild(usenet_toggleButton);
-
-        // Add the cell to the row
+        newCell.colSpan = 3;
+        newCell.style.textAlign = 'center';
+        newCell.appendChild(button);
         newRow.appendChild(newCell);
 
-        // Find the tbody and add the new row at the end
         const tbody = document.querySelector('.w3-table-all > tbody');
         if (tbody) {
-            // Append to the end of the tbody
             tbody.appendChild(newRow);
         } else {
-            // Fallback if tbody not found
-            document.body.appendChild(usenet_toggleButton);
+            document.body.appendChild(button);
         }
-
     }
 
 
-    // Function to remove promotional elements
+
+    // ========================================
+    // Promotional Content Removal
+    // ========================================
+
+    /**
+     * Removes promotional elements from the page
+     */
     function removePromotionalElements() {
-        // Remove the "Would you like to support us?" paragraph
-        document.querySelectorAll('p').forEach(p => {
-            if (p.textContent.includes('Would you like to support us? Thanks!')) {
-                // Find the parent element and remove it
-                const parent = p.closest('.w3-panel.w3-black.w3-center.w3-small');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    p.remove();
-                }
+        removeElementsByText('p', PROMOTIONAL_SELECTORS.supportParagraph, '.w3-panel.w3-black.w3-center.w3-small');
+        removeElementsByText('p', PROMOTIONAL_SELECTORS.wannaSupportParagraph, '.w3-panel.w3-black.w3-center.w3-small');
+        removeElementsByText('p', PROMOTIONAL_SELECTORS.ddownloadBanner, '.w3-panel.w3-black.w3-center.w3-small');
+        removeElementsByText('a', PROMOTIONAL_SELECTORS.vpnAdvertisement, 'a.w3-block');
+        removeElementsByText('a', PROMOTIONAL_SELECTORS.freeHighspeedDownload, 'div');
+        removeElementsByText('a', PROMOTIONAL_SELECTORS.highspeedDownload, 'div');
+        removeElementsByText('p', PROMOTIONAL_SELECTORS.FreeHostsAndNZBsNotice, 'div');
+
+        removeElements('a[href="/ddlto"]', (element) => {
+            if (element.classList.contains('w3-block') && element.classList.contains('w3-orange')) {
+                element.remove();
             }
         });
 
-        // Remove the orange ddownload.com banner
-        document.querySelectorAll('a[href="/ddlto"]').forEach(a => {
-            if (a.classList.contains('w3-block') && a.classList.contains('w3-orange')) {
-                a.remove();
-            }
-        });
-
-        // Remove the entire promotional panel if it exists
-        document.querySelectorAll('.w3-panel.w3-black.w3-center.w3-small').forEach(panel => {
-            const paragraphs = panel.querySelectorAll('p');
-            for (let p of paragraphs) {
-                if (p.textContent.includes('Would you like to support us? Thanks!')) {
-                    panel.remove();
-                    break;
-                }
-            }
-        });
-
-        // Remove the partner banner (hd-source.to)
-        document.querySelectorAll('.w3-content.w3-black.w3-center.w3-padding.w3-margin-bottom').forEach(div => {
-            const links = div.querySelectorAll('a[href*="hd-source.to"]');
-            if (links.length > 0) {
-                div.remove();
-            }
-        });
-
-        // Alternative way to find the partner banner
-        document.querySelectorAll('a[href*="hd-source.to"]').forEach(a => {
-            const parentDiv = a.closest('.w3-content.w3-black.w3-center.w3-padding.w3-margin-bottom');
+        removeElements('a[href*="hd-source.to"]', (element) => {
+            const parentDiv = element.closest('.w3-content.w3-black.w3-center.w3-padding.w3-margin-bottom');
             if (parentDiv) {
                 parentDiv.remove();
             }
         });
 
-        // Look for the image as well
-        document.querySelectorAll('img[src*="hd-source-partner-banner"]').forEach(img => {
-            const parentDiv = img.closest('.w3-content.w3-black.w3-center.w3-padding.w3-margin-bottom');
+        removeElements('img[src*="hd-source-partner-banner"]', (element) => {
+            const parentDiv = element.closest('.w3-content.w3-black.w3-center.w3-padding.w3-margin-bottom');
             if (parentDiv) {
                 parentDiv.remove();
             }
         });
 
-        // Delete freediscussions.com (Usenet)
-        document.querySelectorAll('img[alt="freediscussions.com"]').forEach(img => {
-            const tableRow = img.closest('tr');
+        removeElements('img[alt="freediscussions.com"]', (element) => {
+            const tableRow = element.closest('tr');
             if (tableRow) {
                 tableRow.remove();
             }
         });
-
-        // Remove the "Use a VPN to unlock the streaming & downloading - Signup Now?" advertisement
-        document.querySelectorAll('a').forEach(a => {
-            if (a.textContent.includes('Use a VPN to unlock the streaming & downloading - Signup Now!')) {
-                // Find the parent element and remove it
-                const parent = a.closest('a.w3-block');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    a.remove();
-                }
-            }
-        });
-
-        // Remove Free Highspeed Download
-        document.querySelectorAll('a').forEach(a => {
-            if (a.textContent.includes('⚡ Free Highspeed Download')) {
-                // Find the parent element and remove it
-                const parent = a.closest('div');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    a.remove();
-                }
-            }
-        });
-
-        // Remove Highspeed Download
-        document.querySelectorAll('a').forEach(a => {
-            if (a.textContent.includes('⚡ Highspeed Download')) {
-                // Find the parent element and remove it
-                const parent = a.closest('div');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    a.remove();
-                }
-            }
-        });
-
-        // Remove the "Would you like to support us?" paragraph
-        document.querySelectorAll('p').forEach(p => {
-            if (p.textContent.includes('Wanna support us?')) {
-                // Find the parent element and remove it
-                const parent = p.closest('.w3-panel.w3-black.w3-center.w3-small');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    p.remove();
-                }
-            }
-        });
-
-        // Remove "At ddownload.com you can get an annual account..."
-        document.querySelectorAll('p').forEach(p => {
-            if (p.textContent.includes('At ddownload.com you can get an annual account')) {
-                // Find the parent element and remove it
-                const parent = p.closest('.w3-panel.w3-black.w3-center.w3-small');
-                if (parent) {
-                    parent.remove();
-                } else {
-                    p.remove();
-                }
-            }
-        });
-
     }
 
-    // Function to make the Notes section collapsible - run this only once
+    // ========================================
+    // Notes Section
+    // ========================================
+
+    /**
+     * Makes the Notes section collapsible
+     */
     function makeNotesCollapsible() {
-        // Check if we've already processed the notes sections
         if (document.querySelector('.notes-processed')) {
             return;
         }
 
         document.querySelectorAll('div.w3-dark-grey.w3-padding').forEach(div => {
-            if (div.textContent.includes('Notes') && !div.classList.contains('notes-processed')) {
-                // Mark this div as processed to avoid duplicate processing
-                div.classList.add('notes-processed');
-
-                // Find the next element after the Notes header
-                let contentDiv = div.nextElementSibling;
-
-                if (contentDiv) {
-                    // Create a wrapper div for the content if it doesn't exist
-                    const wrapperDiv = document.createElement('div');
-                    wrapperDiv.className = 'notes-content';
-                    wrapperDiv.style.display = 'none'; // Hidden by default
-
-                    // Insert the wrapper before the content
-                    div.parentNode.insertBefore(wrapperDiv, contentDiv);
-
-                    // Move the content into the wrapper
-                    wrapperDiv.appendChild(contentDiv);
-
-                    // Make the header clickable
-                    div.style.cursor = 'pointer';
-                    div.style.setProperty('background-color', 'rgb(45, 45, 45)', 'important');
-                    div.style.fontWeight = 'bold';
-                    div.title = 'Click to expand/collapse';
-
-                    // Add a visual indicator if it doesn't exist
-                    if (!div.querySelector('.collapse-indicator')) {
-                        const indicator = document.createElement('span');
-                        indicator.textContent = ' [+]';
-                        indicator.style.float = 'right';
-                        indicator.className = 'collapse-indicator';
-                        div.appendChild(indicator);
-                    }
-
-                    // Add click event
-                    div.addEventListener('click', function() {
-                        const indicator = div.querySelector('.collapse-indicator');
-                        if (wrapperDiv.style.display === 'none') {
-                            wrapperDiv.style.display = 'block';
-                            if (indicator) indicator.textContent = ' [-]';
-                        } else {
-                            wrapperDiv.style.display = 'none';
-                            if (indicator) indicator.textContent = ' [+]';
-                        }
-                    });
-                }
+            if (!div.textContent.includes('Notes') || div.classList.contains('notes-processed')) {
+                return;
             }
+
+            div.classList.add('notes-processed');
+            const contentDiv = div.nextElementSibling;
+
+            if (!contentDiv) {
+                return;
+            }
+
+            const wrapperDiv = document.createElement('div');
+            wrapperDiv.className = 'notes-content';
+            wrapperDiv.style.display = 'none';
+
+            div.parentNode.insertBefore(wrapperDiv, contentDiv);
+            wrapperDiv.appendChild(contentDiv);
+
+            div.style.cursor = 'pointer';
+            div.style.setProperty('background-color', 'rgb(45, 45, 45)', 'important');
+            div.style.fontWeight = 'bold';
+            div.title = 'Click to expand/collapse';
+
+            if (!div.querySelector('.collapse-indicator')) {
+                const indicator = document.createElement('span');
+                indicator.textContent = ' [+]';
+                indicator.style.float = 'right';
+                indicator.className = 'collapse-indicator';
+                div.appendChild(indicator);
+            }
+
+            div.addEventListener('click', function() {
+                const indicator = div.querySelector('.collapse-indicator');
+                const isHidden = wrapperDiv.style.display === 'none';
+                wrapperDiv.style.display = isHidden ? 'block' : 'none';
+                if (indicator) {
+                    indicator.textContent = isHidden ? ' [-]' : ' [+]';
+                }
+            });
         });
     }
 
-    // Function to add dark mode toggle button
+    // ========================================
+    // Dark Mode
+    // ========================================
+
+    /**
+     * Adds the dark mode toggle button to the page
+     */
     function addDarkModeToggle() {
-        // Create the dark mode toggle button
         const toggleButton = document.createElement('button');
-        toggleButton.textContent = '🌙 Dark Mode';
         toggleButton.className = 'dark-mode-toggle w3-button w3-round w3-small';
-        toggleButton.style.position = 'fixed';
-        toggleButton.style.bottom = '60px';
-        toggleButton.style.right = '20px';
-        toggleButton.style.zIndex = '1000';
-        toggleButton.style.padding = '8px 16px';
-        toggleButton.style.opacity = '0.8';
-        toggleButton.style.color = "#a2a2a2";
+        Object.assign(toggleButton.style, BUTTON_CONFIG.darkMode);
 
-        // Check if dark mode is already enabled from localStorage
-        const isDarkMode = localStorage.getItem('g4u-dark-mode') === 'true';
+        const isDarkMode = getStorageBoolean(STORAGE_KEYS.DARK_MODE);
 
-        // Apply dark mode if it was previously enabled
         if (isDarkMode) {
             document.body.classList.add('dark-mode');
-            toggleButton.textContent = '☀️ Light Mode';
         }
 
-        // Add click event to toggle dark mode
-        toggleButton.addEventListener('click', function() {
-            const isDarkModeEnabled = document.body.classList.toggle('dark-mode');
-            localStorage.setItem('g4u-dark-mode', isDarkModeEnabled ? 'true' : 'false');
+        toggleButton.textContent = isDarkMode ? BUTTON_TEXT.darkMode.enabled : BUTTON_TEXT.darkMode.disabled;
 
-            // Update button text
-            toggleButton.textContent = isDarkModeEnabled ? '☀️ Light Mode' : '🌙 Dark Mode';
+        toggleButton.addEventListener('click', function() {
+            const isEnabled = document.body.classList.toggle('dark-mode');
+            setStorageBoolean(STORAGE_KEYS.DARK_MODE, isEnabled);
+            toggleButton.textContent = isEnabled ? BUTTON_TEXT.darkMode.enabled : BUTTON_TEXT.darkMode.disabled;
         });
 
-        // Add the button to the page
         document.body.appendChild(toggleButton);
     }
 
-    // Function to add dark mode CSS
+    /**
+     * Adds dark mode CSS styles to the page
+     */
     function addDarkModeCSS() {
         const darkModeCSS = `
         /* Dark Mode Styles */
