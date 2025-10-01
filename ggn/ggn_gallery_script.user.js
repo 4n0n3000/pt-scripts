@@ -172,7 +172,7 @@ function initConfig() {
                     style.borderRadius = '5px';
                     style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.1)';
 
-                    saved = false;
+                    state.configSaved = false;
 
                     const versionEl = document.createElement('span');
                     versionEl.classList = 'version_label reset';
@@ -203,18 +203,14 @@ function initConfig() {
                         if (el) el.classList.add('slider-section');
                     });
                 },
-                save: function(){
-                    saved = true;
+                save: function() {
+                    state.configSaved = true;
                     try { clearCoverCache(); } catch(e) {}
                     try { applyConfigStyles(); } catch(e) {}
                 },
-                close: function(){
-                    if (saved) {
-                        if (this.frame) {
-                            window.location.reload();
-                        } else {
-                            setTimeout(() => window.location.reload(), 250);
-                        }
+                close: function() {
+                    if (state.configSaved) {
+                        reloadPageSafely(this.frame);
                     }
                 }
             },
