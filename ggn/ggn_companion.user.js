@@ -5,7 +5,7 @@
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_companion.user.js
 // @match       https://gazellegames.net/*
 // @grant       none
-// @version     1.0.0
+// @version     1.0.1
 // @author      BEY0NDER
 // @description Makes the site darker and changes the way NFO Images are rendered
 // @icon	     https://gazellegames.net/favicon.ico
@@ -61,7 +61,7 @@ body {
 	backdrop-filter: blur(5px);
 }
 
-.box, table {
+.box, table, .profile .box_main_info {
     background: none !important;
 }
 
