@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         PTP Fanart Background & Logo
-// @version      1.1.11
+// @version      1.1.12
 // @description  Replaces PTP background and logo with Fanart artwork and applies blur + dark overlay for movies
 // @author       BEY0NDER
 // @namespace    https://github.com/4n0n3000/pt-scripts
@@ -400,7 +400,7 @@
         CONFIG
     });
 
-    // Unused Default CSS for future use
+    // Default CSS
     const defaultCSS = `
         .forum-post {
             background-color: #2f354669;
