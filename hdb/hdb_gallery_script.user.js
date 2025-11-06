@@ -1009,8 +1009,7 @@ function parseAlternativePageTorrent(row) {
 function extractTorrentsFromStandardPage() {
     const torrentElements = document.querySelectorAll(DOM_SELECTORS.GROUP_ID);
     torrentElements.forEach(torrentElement => {
-        const torrent = parseStandardPageTorrent(torrentElement);
-        console.log(torrent);
+        const torrent = parseStandardPageTorrent(torrentElement);;
         state.groups.push(torrent);
     });
 }
