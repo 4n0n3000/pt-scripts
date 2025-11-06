@@ -3,7 +3,7 @@
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/HDB/hdb_gallery_script.js
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/HDB/hdb_gallery_script.js
-// @version      1.0.0
+// @version      1.0.1
 // @description  HDB Torrent Gallery Script for Tokyo Night Dark theme. Work In Progress...
 // @include      https://hdbits.org/browse.php*
 // @grant        GM_xmlhttpRequest
