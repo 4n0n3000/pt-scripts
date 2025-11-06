@@ -599,6 +599,101 @@ function injectGalleryStyles() {
       p:has(a[href*="page="]):not(.sub) { margin-bottom: 1rem !important; }
       .bottom:not([id]) { max-width: var(--max-gallery-width); }
       
+      /* Featured badge pseudo-elements */
+      [id^="featured"]:has([class^="featured"])::before,
+      [id^="featured"]:has([class^="featured"])::after {
+        box-sizing: content-box;
+        display: flex;
+        z-index: 2;
+        align-items: center;
+        justify-content: center;
+        width: 55px;
+        height: 21px;
+        font-variant: small-caps;
+        font-weight: 500;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      
+      [id^="featured"]:has([class^="featured"])::before {
+        border: 1px solid rgba(255, 221, 118, 0.5);
+        background-color: hsla(45, 100%, 73%, 0.1);
+        content: "Featured";
+        color: hsl(45.1, 100%, 73.1%);
+        font-variant: all-small-caps;
+        border-radius: var(--small-br) var(--small-br) 0 0;
+        font-size: 0.75rem;
+      }
+      
+      #featured1:has([class^="featured"])::after {
+        border: var(--general-border);
+        background-color: var(--crust);
+        content: "Free";
+        color: #ff4b4b;
+        border-top: 0 !important;
+        border-radius: 0 0 var(--small-br) var(--small-br);
+        font-size: 0.6875rem;
+      }
+      
+      /* Freeleech badge pseudo-elements */
+      [id^="freeleech"]:has([class^="freeleech"])::before,
+      [id^="freeleech"]:has([class^="freeleech"])::after {
+        box-sizing: content-box;
+        display: flex;
+        z-index: 2;
+        align-items: center;
+        justify-content: center;
+        width: 55px;
+        height: 21px;
+        font-variant: small-caps;
+        font-weight: 500;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      
+      [id^="freeleech"]:has([class^="freeleech"])::before {
+        border-radius: var(--small-br);
+        font-size: 0.75rem;
+      }
+      
+      [id^="freeleech"]:has([class^="freeleech"])::after {
+        border-top: 0 !important;
+        border-radius: 0 0 var(--small-br) var(--small-br);
+        font-size: 0.6875rem;
+      }
+      
+      /* 100% Freeleech */
+      #freeleech100:has([class^="freeleech"])::before {
+        border: 1px solid rgba(0, 255, 0, 0.5);
+        background-color: hsla(120, 100%, 25%, 0.3);
+        content: "100% FL";
+        color: #00ff00;
+      }
+      
+      /* 50% Freeleech */
+      #freeleech50:has([class^="freeleech"])::before {
+        border: 1px solid rgba(255, 165, 0, 0.5);
+        background-color: hsla(39, 100%, 25%, 0.3);
+        content: "50% FL";
+        color: #ffa500;
+      }
+      
+      /* 25% Freeleech */
+      #freeleech25:has([class^="freeleech"])::before {
+        border: 1px solid rgba(255, 255, 0, 0.5);
+        background-color: hsla(60, 100%, 25%, 0.3);
+        content: "25% FL";
+        color: #ffff00;
+      }
+      
+      /* Neutral Leech */
+      #freeleechNeutral:has([class^="freeleech"])::before {
+        border: 1px solid rgba(135, 206, 235, 0.5);
+        background-color: hsla(197, 71%, 37%, 0.3);
+        content: "Neutral";
+        color: #87ceeb;
+      }
+      
       /* Responsive columns */
       @media (max-width: 1400px) {
         #collageBody { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
