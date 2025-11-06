@@ -73,7 +73,7 @@ const CONTENT_CHILD_INDICES = {
 // Data Models
 // ========================================
 class Torrent {
-    constructor(link, name, category, codec, medium, imdbRating, featured, newtag, internal, exclusive, genres, when, size, downloadLink, rssAdd, bookmarkAdd, wishlistAdd, rssAddId, img, seeds, snatched, leechers) {
+    constructor(link, name, category, codec, medium, imdbRating, featured, newtag, internal, exclusive, genres, when, size, downloadLink, rssAdd, bookmarkAdd, wishlistAdd, rssAddId, img, seeds, snatched, leechers, freeleech) {
         this.link = link;
         this.name = name;
         this.img = '';
@@ -97,6 +97,7 @@ class Torrent {
         this.seeds = seeds;
         this.snatched = snatched;
         this.leechers = leechers;
+        this.freeleech = freeleech || null;
     }
 }
 
