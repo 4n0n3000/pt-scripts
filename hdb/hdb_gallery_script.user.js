@@ -1065,7 +1065,7 @@ function createStandardTorrent(element, category) {
     let itemCodec = '';
     let itemMedium = '';
     let itemImdbRating = '';
-    let itemFeatured = '';
+    let itemFeatured = false;
     let itemNewtag = false;
     let itemInternal = false;
     let itemExclusive = false;
@@ -1082,7 +1082,11 @@ function createStandardTorrent(element, category) {
     let imdbLinkInnerHTML = '';
     let itemRssAddId = '';
     let imageLink = '';
-
+    let itemFreeleech = '';
+    
+    if (element.classList.contains('featured')) {
+        itemFeatured = true;
+    }
     const aTags = element.getElementsByTagName('a');
     const bTags = element.getElementsByTagName('b');
     const tdTags = element.getElementsByTagName('td');
@@ -1091,11 +1095,27 @@ function createStandardTorrent(element, category) {
     for (let i = 0; i < aTags.length; i++) {
         if (aTags[i].hasAttribute('data-imdb-link')) {
             itemImdbRating = aTags[i].innerText.replace(' ', '<br>');
-            console.log(itemImdbRating);
         }
         if (aTags[i].href.includes('/details.php?id=') && aTags[i].parentElement === bTags[0]) {
             itemLink = 'https://hdbits.org' + aTags[i].getAttribute('href');
             itemName = aTags[i].innerText;
+                        // Check for freeleech status in download link title
+            const linkTitle = aTags[i].getAttribute('title');
+            if (linkTitle) {
+                if (linkTitle.startsWith('100% FL')) {
+                    itemFreeleech = '100%';
+                    console.log('100% Freeleech detected: ' + itemName);
+                } else if (linkTitle.startsWith('50% Free Leech')) {
+                    itemFreeleech = '50%';
+                    console.log('50% Freeleech detected: ' + itemName);
+                } else if (linkTitle.startsWith('25% Free Leech')) {
+                    itemFreeleech = '25%';
+                    console.log('25% Freeleech detected: ' + itemName);
+                } else if (linkTitle.startsWith('Neutral Leech')) {
+                    itemFreeleech = 'Neutral';
+                    console.log('Neutral Leech detected: ' + itemName);
+                }
+            }
         }
         if (aTags[i].classList.contains('js-download')) {
             itemDownloadLink = 'https://hdbits.org' + aTags[i].getAttribute('href');
@@ -1167,7 +1187,8 @@ function createStandardTorrent(element, category) {
         imageLink,
         itemSeeds,
         itemSnatched,
-        itemLeechers
+        itemLeechers,
+        itemFreeleech
     );
 }
 
