@@ -764,7 +764,38 @@ function createReleaseTitle(group) {
 function createReleaseMedia(group) {
     const releaseMedia = createElement('div', { className: 'releaseMedia' });
     const codec = createElement('span', { id: group.codec, innerHTML: `<div class="${group.medium}"></div>` });
+    const featured = createElement('span', { innerHTML: `<div class="featured"></div>` });
+    const freeleech = createElement('span', { innerHTML: `<div class="freeleech"></div>` });
     const category = createElement('span', { innerHTML: `<div class="${group.category}"></div>` });
+    
+    // Add "Featured" badge when group.featured is true
+    if (group.featured) {
+        featured.id = 'featured1';
+        featured.style.cssText = `
+            position: absolute;
+            top: 60px;
+            background-color: black;
+            border-radius: var(--small-br) var(--small-br);
+            opacity: 0.9;
+        `;
+    }
+    
+    // Add "Freeleech" badge when group.freeleech is present
+    if (group.freeleech && !group.featured) {
+        const freeleechType = group.freeleech === '100%' ? 'freeleech100' : 
+                             group.freeleech === '50%' ? 'freeleech50' :
+                             group.freeleech === '25%' ? 'freeleech25' :
+                             group.freeleech === 'Neutral' ? 'freeleechNeutral' : 'freeleech100';
+        freeleech.id = freeleechType;
+        freeleech.style.cssText = `
+            position: absolute;
+            top: 60px;
+            background-color: black;
+            border-radius: var(--small-br);
+            opacity: 0.9;
+        `;
+    }
+    
     category.style.cssText = `
         position: absolute;
         top: 60px;
@@ -786,7 +817,12 @@ function createReleaseMedia(group) {
         const image = createCoverImage(group.img);
         const imageLink = createElement('a', { href: group.link });
         imageLink.append(image);
-        releaseMedia.append(coverBg, imageLink, codec, category);
+        
+        // Append elements based on what badges are present
+        const elements = [coverBg, imageLink, codec, category];
+        if (group.featured) elements.push(featured);
+        if (group.freeleech) elements.push(freeleech);
+        releaseMedia.append(...elements);
     } else {
         releaseMedia.append(createElement('div', { className: 'no-image' }), codec, category);
     }
