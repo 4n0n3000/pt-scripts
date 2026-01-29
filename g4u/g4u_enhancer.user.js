@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         G4U Enhancer
-// @version      1.1.0
+// @version      1.1.1
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -34,7 +34,9 @@
         'katfile.com',
         'gofile.io',
         'vikingfile.com',
-        'katfile.cloud'
+        'katfile.cloud',
+        'katfile.online',
+        'rootz.so',
     ];
 
     const PROMOTIONAL_SELECTORS = {

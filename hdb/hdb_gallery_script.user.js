@@ -584,10 +584,10 @@ function injectGalleryStyles() {
       .releaseFooter{text-align:center;font-size:10pt;display:var(--footer-details);padding:10px;overflow:hidden;line-height:1.3;white-space:nowrap;text-overflow:ellipsis;color:var(--HDB-text);background:var(--mantle);position:relative;z-index:1;font-weight:bold;margin-top:auto;}
       .footerTable{width:100%;height:100%;border-collapse:collapse;table-layout:fixed;}
       .footerTable td{padding:4px 6px;vertical-align:middle;text-align:center;}
-      .footerMetaRow{color:var(--yellow);font-variant:small-caps;font-size:var(--font-size-tag);text-transform:lowercase;}
+      .footerMetaRow{color:var(--yellow);font-variant:small-caps;font-size:0.85rem;text-transform:lowercase;}
       .footerMetaRow span{display:block;}
       .footerGenresCell{color:#66707f;font-weight:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:calc(var(--footer-font-size) - var(--footer-font-minus));}
-      .footerStatsRow{color:var(--yellow);font-variant:small-caps;font-size:var(--font-size-tag);text-transform:lowercase;}
+      .footerStatsRow{color:var(--yellow);font-variant:small-caps;font-size:0.85rem;text-transform:lowercase;}
       .footerStatsRow span{display:block;}
       .footerStatsValue{font-size:calc(var(--footer-font-size) + var(--footer-font-plus));font-variant:initial;color:var(--HDB-text);font-weight:bold;}
       .footerActionsCell{padding-top:10px;}
