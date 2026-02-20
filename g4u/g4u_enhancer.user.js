@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         G4U Enhancer
-// @version      1.1.1
+// @version      1.2.0
 // @description  Removes promotional elements, nullifies openPopup function, and adds dark mode to g4u.to
 // @author       BEY0NDER
 // @match        *://g4u.to/*
@@ -27,17 +27,6 @@
     };
 
     const GAME_PAGE_REGEX = /^https:\/\/g4u\.to\/\w+\/\d+-.*/;
-
-    const NON_USENET_HOSTS = [
-        'ddownload.com',
-        'rapidgator.net',
-        'katfile.com',
-        'gofile.io',
-        'vikingfile.com',
-        'katfile.cloud',
-        'katfile.online',
-        'rootz.so',
-    ];
 
     const PROMOTIONAL_SELECTORS = {
         supportParagraph: 'Would you like to support us? Thanks!',
@@ -160,13 +149,12 @@
      * Toggles visibility of non-Usenet download hosts
      */
     function toggleNonUsenetHosts(isUsenetModeEnabled) {
-        NON_USENET_HOSTS.forEach(host => {
-            removeElements(`img[alt="${host}"]`, (img) => {
-                const tableRow = img.closest('div');
-                if (tableRow) {
-                    tableRow.style.display = isUsenetModeEnabled ? 'none' : '';
-                }
-            });
+        const container = document.querySelector('.w3-row-padding');
+        if (!container) return;
+        Array.from(container.children).forEach(child => {
+            if (!child.querySelector('img[alt="nzb (usenet)"]')) {
+                child.style.display = isUsenetModeEnabled ? 'none' : '';
+            }
         });
     }
 
