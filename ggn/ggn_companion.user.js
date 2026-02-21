@@ -5,7 +5,7 @@
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/ggn/ggn_companion.user.js
 // @match       https://gazellegames.net/*
 // @grant       none
-// @version     1.1.0
+// @version     1.1.1
 // @author      BEY0NDER
 // @description Makes the site darker and changes the way NFO Images are rendered
 // @icon	     https://gazellegames.net/favicon.ico
@@ -14,7 +14,7 @@
 function GGn_companion() {
 
     // NFO Image Adjustments
-    const nfoImg = document.querySelectorAll('img').forEach((img) => {
+    document.querySelectorAll('img').forEach((img) => {
         if (img.src.includes('/nfoimg/')) {
             img.style.filter = 'invert(100%)';
             img.style.mixBlendMode = 'screen';
@@ -91,10 +91,12 @@ body {
     document.head.appendChild(style);
     
     // State management for CSS toggle
-    let cssInjected = true;
-    style.textContent = css; // Inject CSS by default
-    
-    // Create floating toggle button
+    let cssInjected = localStorage.getItem('ggn-theme-toggle') === 'true';
+    if (cssInjected) {
+        style.textContent = css;
+    }
+
+    // Create a floating toggle button
     const toggleButton = document.createElement('button');
     toggleButton.id = 'ggn-theme-toggle';
     toggleButton.style.cssText = `
@@ -154,105 +156,108 @@ body {
     // Toggle functionality
     toggleButton.addEventListener('click', () => {
         cssInjected = !cssInjected;
-        
+
         if (cssInjected) {
+            localStorage.setItem('ggn-theme-toggle', 'true');
             style.textContent = css;
             toggleButton.innerHTML = moonIcon;
         } else {
+            localStorage.setItem('ggn-theme-toggle', 'false');
             style.textContent = '';
             toggleButton.innerHTML = sunIcon;
         }
     });
-    
-    // Append button to body
     document.body.appendChild(toggleButton);
 
-    function typeFilter() {
-        const group_torrent = document.querySelectorAll('.group_torrent');
-        group_torrent.forEach(torrent => {
-            const torrentIdRegex = /torrent\d+/;
-            if (!torrentIdRegex.test(torrent.id)) {
-                torrent.id = 'group_header';
-                return;
-            }
-            const sceneRegex = /(\[|,\s)(Scene)/;
-            if (sceneRegex.test(torrent.innerText)) {
-                torrent.classList.add('scene');
-            } else {
-                torrent.classList.add('p2p');
-            }
+    if (document.URL.includes('torrents.php?id=')) {
+        function typeFilter() {
+            const group_torrent = document.querySelectorAll('.group_torrent');
+            group_torrent.forEach(torrent => {
+                const torrentIdRegex = /torrent\d+/;
+                if (!torrentIdRegex.test(torrent.id)) {
+                    torrent.id = 'group_header';
+                    return;
+                }
+                const sceneRegex = /(\[|,\s)(Scene)/;
+                if (sceneRegex.test(torrent.innerText)) {
+                    torrent.classList.add('scene');
+                } else {
+                    torrent.classList.add('p2p');
+                }
 
-            const drmFreeRegex = /(\[|,\s)(DRM Free|GOG)/;
-            if (drmFreeRegex.test(torrent.innerText)) {
-                torrent.classList.add('drm_free');
-            }
-            
-        });
-    }
-    typeFilter();
+                const drmFreeRegex = /(\[|,\s)(DRM Free|GOG)/;
+                if (drmFreeRegex.test(torrent.innerText)) {
+                    torrent.classList.add('drm_free');
+                }
 
-    const torrentDetails = document.querySelector('.torrent_details');
-    const dropdown = document.createElement('select');
-    dropdown.innerHTML = `
+            });
+        }
+
+        typeFilter();
+
+        const torrentDetails = document.querySelector('.torrent_details');
+        const dropdown = document.createElement('select');
+        dropdown.innerHTML = `
         <option value="all">All</option>
         <option value="scene">Scene</option>
         <option value="p2p">P2P</option>
         <option value="drm_free">DRM Free</option>
     `;
-    
-    dropdown.style.display = 'block';
-    dropdown.style.position = 'absolute';
-    dropdown.style.right = '10px';
-    dropdown.style.top = '54px';
-    
-    torrentDetails.insertBefore(dropdown, torrentDetails.querySelector('.groupoptions'));
 
-    dropdown.addEventListener('change', (event) => {
-        filterTorrents(event.target.selectedOptions);
-    });
+        dropdown.style.display = 'block';
+        dropdown.style.position = 'absolute';
+        dropdown.style.right = '10px';
+        dropdown.style.top = '54px';
 
-    function filterTorrents(selectedOptions) {
-        const group_torrent = document.querySelectorAll('.group_torrent');
-        const selectedValue = selectedOptions[0].value;
-        const torrentIdRegex = /torrent\d+/;
-        
-        group_torrent.forEach(torrent => {
-            if (!torrentIdRegex.test(torrent.id)) {
-                return;
-            }
-            
-            if (selectedValue === 'all') {
-                torrent.style.display = '';
-            } else if (torrent.classList.contains(selectedValue)) {
-                torrent.style.display = '';
-            } else {
-                torrent.style.display = 'none';
-            }
+        torrentDetails.insertBefore(dropdown, torrentDetails.querySelector('.groupoptions'));
+
+        dropdown.addEventListener('change', (event) => {
+            filterTorrents(event.target.selectedOptions);
         });
-        
-        // Hide group_header elements where the next sibling is hidden
-        // Hide tbody elements where all children are hidden
-        const tbodies = new Set();
-        group_torrent.forEach(torrent => {
-            if (torrent.parentElement) {
-                tbodies.add(torrent.parentElement);
-            }
-        });
-        
-        tbodies.forEach(tbody => {
-            const editionRegex = /edition_\d+/;
-            if (editionRegex.test(tbody.id)) {
-                const rows = tbody.querySelectorAll('tr');
-                const allHidden = Array.from(rows).every(row => 
-                    row.style.display === 'none' || row.classList.contains('hidden')
-                );
-                if (allHidden && rows.length > 0) {
-                    tbody.previousElementSibling.style.display = 'none';
-                } else {
-                    tbody.previousElementSibling.style.display = '';
+
+        function filterTorrents(selectedOptions) {
+            const group_torrent = document.querySelectorAll('.group_torrent');
+            const selectedValue = selectedOptions[0].value;
+            const torrentIdRegex = /torrent\d+/;
+
+            group_torrent.forEach(torrent => {
+                if (!torrentIdRegex.test(torrent.id)) {
+                    return;
                 }
-            }
-        });
+
+                if (selectedValue === 'all') {
+                    torrent.style.display = '';
+                } else if (torrent.classList.contains(selectedValue)) {
+                    torrent.style.display = '';
+                } else {
+                    torrent.style.display = 'none';
+                }
+            });
+
+            // Hide group_header elements where the next sibling is hidden
+            // Hide tbody elements where all children are hidden
+            const tbodies = new Set();
+            group_torrent.forEach(torrent => {
+                if (torrent.parentElement) {
+                    tbodies.add(torrent.parentElement);
+                }
+            });
+
+            tbodies.forEach(tbody => {
+                const editionRegex = /edition_\d+/;
+                if (editionRegex.test(tbody.id)) {
+                    const rows = tbody.querySelectorAll('tr');
+                    const allHidden = Array.from(rows).every(row =>
+                        row.style.display === 'none' || row.classList.contains('hidden')
+                    );
+                    if (allHidden && rows.length > 0) {
+                        tbody.previousElementSibling.style.display = 'none';
+                    } else {
+                        tbody.previousElementSibling.style.display = '';
+                    }
+                }
+            });
+        }
     }
 }
 GGn_companion();
