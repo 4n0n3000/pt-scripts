@@ -3,7 +3,7 @@
 // @namespace    https://github.com/4n0n3000/pt-scripts
 // @downloadURL  https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/HDB/hdb_gallery_script.js
 // @updateURL    https://raw.githubusercontent.com/4n0n3000/pt-scripts/main/HDB/hdb_gallery_script.js
-// @version      1.0.1
+// @version      1.0.2
 // @description  HDB Torrent Gallery Script for Tokyo Night Dark theme. Work In Progress...
 // @include      https://hdbits.org/browse.php*
 // @grant        GM_xmlhttpRequest
@@ -27,7 +27,8 @@
 // ========================================
 // Constants
 // ========================================
-const STORAGE_KEY_GALLERY_VIEW = 'galleryView';
+const STORAGE_KEY_GALLERY_VIEW = 'hdb_gallery_show';
+const OLD_STORAGE_KEY_GALLERY_VIEW = 'galleryView';
 const CACHE_KEY_PREFIX = 'HDB.cover:';
 const CONFIG_ID = 'HDB_Gallery_Config';
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -106,7 +107,24 @@ class Torrent {
 // ========================================
 const state = {
     groups: [],
-    showGallery: localStorage.getItem(STORAGE_KEY_GALLERY_VIEW) !== 'false',
+    showGallery: (function() {
+        let val = GM_getValue(STORAGE_KEY_GALLERY_VIEW);
+
+        if (val === undefined || val === null) {
+            const oldVal = localStorage.getItem(OLD_STORAGE_KEY_GALLERY_VIEW) || localStorage.getItem(STORAGE_KEY_GALLERY_VIEW);
+            if (oldVal !== null) {
+                val = oldVal === 'true';
+                GM_setValue(STORAGE_KEY_GALLERY_VIEW, val);
+                console.log('Migrated gallery state from localStorage:', val);
+            } else {
+                val = true; // Default
+            }
+        }
+
+        const finalVal = val === true || val === 'true';
+        console.log('Initial gallery state:', finalVal);
+        return finalVal;
+    })(),
     isAlternativePage: isAlternativePageLayout(),
     configSaved: false
 };
@@ -120,48 +138,46 @@ function isAlternativePageLayout() {
 // Initialization
 // ========================================
 function init() {
+    console.log('Initializing HDB Gallery Script');
     initConfig();
     initTorrentInfo();
     initGallery();
+    applyGalleryState();
     initGroups();
     initImages();
     applyGalleryState();
+    
+    // Safety check: ensure it's applied after a short delay in case of late styling
+    setTimeout(applyGalleryState, 100);
 }
 
 // ========================================
 // Gallery State Management
 // ========================================
 function applyGalleryState() {
-    const collage = document.getElementById('collageBody');
-    if (!collage) return;
+    const collage = document.getElementById('hdbGalleryBody');
+    const toggleLink = document.getElementById('galleryToggle');
     
-    const displayValue = state.showGallery ? '' : 'none';
-    const inverseDisplayValue = state.showGallery ? 'none' : '';
+    if (!collage) {
+        console.warn('Gallery body not found, cannot apply state');
+        return;
+    }
     
-    collage.style.display = displayValue;
-    // toggleOriginalTable(inverseDisplayValue);
+    const displayValue = state.showGallery ? 'grid' : 'none';
+    
+    console.log('Applying gallery state. showGallery:', state.showGallery, 'display:', displayValue);
+    collage.style.setProperty('display', displayValue, 'important');
+    
+    if (toggleLink) {
+        toggleLink.innerHTML = state.showGallery ? '[Hide Gallery]' : '[Show Gallery]';
+    }
 }
 
-// function toggleOriginalTable(displayValue) {
-//     try {
-//         const contentIndex = state.isAlternativePage ? 0 : 1;
-//         const content = document.getElementById('content');
-//         const original = content?.children[contentIndex]?.children[CONTENT_CHILD_INDICES.ORIGINAL_TABLE_POSITION]?.children[0];
-        
-//         if (original) {
-//             original.style.display = displayValue;
-//         }
-//     } catch (e) {
-//         const table = document.querySelector(DOM_SELECTORS.TORRENT_TABLE);
-//         if (table) {
-//             table.style.display = displayValue;
-//         }
-//     }
-// }
-
-function toggleGallery() {
+function toggleGallery(e) {
+    if (e) e.preventDefault();
     state.showGallery = !state.showGallery;
-    localStorage.setItem(STORAGE_KEY_GALLERY_VIEW, state.showGallery);
+    console.log('Toggling gallery. New state:', state.showGallery);
+    GM_setValue(STORAGE_KEY_GALLERY_VIEW, state.showGallery);
     applyGalleryState();
 }
 
@@ -437,7 +453,7 @@ function setCachedCover(link, url) {
 // Cover Image Management
 // ========================================
 function applyCoverToIndex(index, url) {
-    const collage = document.getElementById('collageBody');
+    const collage = document.getElementById('hdbGalleryBody');
     if (!collage) return;
     
     const card = collage.children[index];
@@ -522,7 +538,7 @@ function initGallery() {
 function createGalleryContainer() {
     const gallery = createElement('div', { id: 'gallery_view' });
     const galleryInfo = createGalleryInfo();
-    const collage = createElement('div', { id: 'collageBody' });
+    const collage = createElement('div', { id: 'hdbGalleryBody' });
     
     gallery.append(galleryInfo, collage);
     return gallery;
@@ -533,7 +549,8 @@ function createGalleryInfo() {
     const galleryTitle = createElement('strong', { innerHTML: 'Gallery' });
     const galleryToggle = createElement('a', {
         id: 'galleryToggle',
-        innerHTML: '[Toggle]',
+        innerHTML: state.showGallery ? '[Hide Gallery]' : '[Show Gallery]',
+        href: '#',
         style: 'float:right; margin-left:5px'
     });
     
@@ -566,14 +583,14 @@ function attachGalleryEventListeners() {
 }
 
 function injectGalleryStyles() {
-    const style = document.createElement('style');
-    style.innerHTML = `
+    const displayValue = state.showGallery ? 'grid' : 'none';
+    const css = `
       :root{--HDB-card-bg:#0d0e11;--HDB-card-bg2:#16171d;--HDB-text:#e6f1f7;--HDB-muted:#97a8b6;--HDB-overlay:rgba(0,0,0,0.35);--footer-details:block;--HDB-width:220px;--HDB-cards-per-row:5;}
 	  #gallery_view { background: var(--mantle); padding: 8px; border: var(--table-border); border-radius: var(--main-br); display: grid; max-width: var(--max-gallery-width, 100%); }
 	  #gallery_info{display:flex;align-items:center;justify-content:space-between;color:var(--HDB-text)}
 	  #galleryToggle{float:right;margin-left:5px;color:var(--HDB-text);text-decoration:none;cursor:pointer}
 	  #galleryToggle:hover{text-decoration:underline}
-	  #collageBody{position:relative;display:grid;grid-template-columns:repeat(var(--HDB-cards-per-row, 5), minmax(0, 1fr));gap:10px;float:inline-start;margin-top:10px;background:rgb(22, 23, 29);padding:8px;border-radius:6px;width:-moz-available;}
+	  #hdbGalleryBody{display:${displayValue};position:relative;grid-template-columns:repeat(var(--HDB-cards-per-row, 5), minmax(0, 1fr));gap:10px;float:inline-start;margin-top:10px;background:rgb(22, 23, 29);padding:8px;border-radius:6px;width:-moz-available;}
       .groupWrapper{height:auto;box-sizing:border-box;overflow:hidden;background:var(--mantle);border-radius:var(--main-br);border:var(--table-border);box-shadow:0 1px 2px rgba(0,0,0,0.3);transition:scale .5s ease, box-shadow .15s ease;position:relative;display:flex;flex-direction:column}
 	  .groupWrapper:hover{scale:100%;box-shadow:0px 0px 10px rgba(102, 173, 255, 0.66)}
       .releaseMedia{position:static;display:flex;align-items:center;justify-content:center;aspect-ratio:3/4;flex:1 0 auto}
@@ -696,20 +713,20 @@ function injectGalleryStyles() {
       
       /* Responsive columns */
       @media (max-width: 1400px) {
-        #collageBody { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        #hdbGalleryBody { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
       }
       @media (max-width: 1000px) {
-        #collageBody { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
+        #hdbGalleryBody { grid-template-columns: repeat(1, minmax(0, 1fr)) !important; }
       }
-      `;
-    document.head.append(style);
+    `;
+    GM_addStyle(css);
 }
 
 // ========================================
 // Group Card Rendering
 // ========================================
 function initGroups() {
-    const collage = document.getElementById('collageBody');
+    const collage = document.getElementById('hdbGalleryBody');
     if (!collage) return;
     
     collage.innerHTML = '';
